@@ -1,5 +1,7 @@
 import { forwardRef } from 'react'
 import { useSeatingStore } from '../store/useSeatingStore'
+import { getTableDimensions } from '../lib/seating/layout'
+import { TableViewStatic } from './Canvas/TableView'
 
 export const ExportView = forwardRef<HTMLDivElement>(function ExportView(_, ref) {
   const projectName = useSeatingStore((s) => s.projectName)
@@ -7,71 +9,108 @@ export const ExportView = forwardRef<HTMLDivElement>(function ExportView(_, ref)
   const guests = useSeatingStore((s) => s.guests)
   const groups = useSeatingStore((s) => s.groups)
 
-  const groupMap = new Map(groups.map((g) => [g.id, g]))
+  const bounds = tables.reduce(
+    (acc, t) => {
+      const d = getTableDimensions(t)
+      return {
+        w: Math.max(acc.w, t.x + d.width + 80),
+        h: Math.max(acc.h, t.y + d.height + 100),
+      }
+    },
+    { w: 900, h: 600 },
+  )
 
   return (
     <div
       ref={ref}
-      className="absolute left-[-9999px] top-0 w-[800px] bg-cream p-10"
       aria-hidden
+      style={{
+        position: 'fixed',
+        left: 0,
+        top: 0,
+        width: bounds.w + 80,
+        height: bounds.h + 160,
+        zIndex: -1,
+        pointerEvents: 'none',
+        opacity: 0,
+      }}
     >
-      <div className="text-center">
-        <p className="text-sm uppercase tracking-[0.3em] text-muted">Seating Plan</p>
-        <h1
-          className="mt-2 font-serif text-4xl font-bold text-ink"
-          style={{ fontFamily: 'Playfair Display, serif' }}
+      <div
+        className="export-root"
+        style={{
+          width: bounds.w + 80,
+          minHeight: bounds.h + 160,
+          backgroundColor: '#faf8f5',
+          padding: 40,
+          fontFamily: 'Inter, system-ui, sans-serif',
+        }}
+      >
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <p
+            style={{
+              fontSize: 12,
+              letterSpacing: '0.3em',
+              textTransform: 'uppercase',
+              color: '#6b7280',
+              margin: 0,
+            }}
+          >
+            Seating Plan
+          </p>
+          <h1
+            style={{
+              fontFamily: 'Playfair Display, Georgia, serif',
+              fontSize: 36,
+              fontWeight: 700,
+              color: '#1a1a2e',
+              margin: '8px 0 0',
+            }}
+          >
+            {projectName}
+          </h1>
+          <div
+            style={{
+              width: 96,
+              height: 1,
+              backgroundColor: '#c9a962',
+              margin: '16px auto 0',
+            }}
+          />
+        </div>
+
+        <div
+          className="export-floor"
+          style={{
+            position: 'relative',
+            width: bounds.w,
+            height: bounds.h,
+            margin: '0 auto',
+            backgroundColor: '#faf8f5',
+            backgroundImage: `
+              linear-gradient(to right, rgba(232, 228, 223, 0.5) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(232, 228, 223, 0.5) 1px, transparent 1px)
+            `,
+            backgroundSize: '40px 40px',
+            borderRadius: 16,
+            border: '1px solid #e8e4df',
+          }}
         >
-          {projectName}
-        </h1>
-        <div className="mx-auto mt-4 h-px w-24 bg-gold" />
+          {tables.map((table) => (
+            <TableViewStatic key={table.id} table={table} guests={guests} groups={groups} />
+          ))}
+        </div>
+
+        <p
+          style={{
+            textAlign: 'center',
+            fontSize: 10,
+            color: '#6b7280',
+            marginTop: 32,
+          }}
+        >
+          Created with SeatFinder · Import this PNG to restore your plan
+        </p>
       </div>
-
-      <div className="mt-10 space-y-8">
-        {tables.map((table) => {
-          const seated = guests
-            .filter((g) => g.seat?.tableId === table.id)
-            .sort((a, b) => (a.seat!.seatIndex > b.seat!.seatIndex ? 1 : -1))
-
-          return (
-            <div key={table.id} className="rounded-xl border border-border bg-white p-6 shadow-sm">
-              <h2 className="font-serif text-xl font-semibold text-ink">{table.name}</h2>
-              <p className="text-xs capitalize text-muted">
-                {table.shape} · {seated.length}/{table.capacity} seated
-              </p>
-              <div className="mt-4 grid grid-cols-2 gap-2">
-                {seated.map((guest) => {
-                  const group = guest.groupId ? groupMap.get(guest.groupId) : undefined
-                  return (
-                    <div
-                      key={guest.id}
-                      className="flex items-center gap-2 rounded-lg bg-cream/50 px-3 py-2"
-                    >
-                      <span
-                        className="h-2.5 w-2.5 rounded-full"
-                        style={{ backgroundColor: group?.color ?? '#d1d5db' }}
-                      />
-                      <span className="text-sm font-medium">{guest.name}</span>
-                      {group && (
-                        <span className="ml-auto text-[10px] text-muted">{group.name}</span>
-                      )}
-                      {guest.locked && (
-                        <span className="text-[10px] text-gold">locked</span>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-              {seated.length === 0 && (
-                <p className="mt-2 text-sm italic text-muted">No guests assigned</p>
-              )}
-            </div>
-          )
-        })}
-      </div>
-
-      <p className="mt-10 text-center text-[10px] text-muted">
-        Created with SeatFinder · Import this PNG to restore your plan
-      </p>
     </div>
   )
 })

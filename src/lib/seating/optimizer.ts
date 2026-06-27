@@ -198,8 +198,21 @@ export function runOptimizer(input: OptimizerInput): OptimizerResult {
     return { assignments: [], cost: 0, conflicts: [] }
   }
 
-  let bestAssignment = cloneAssignment(guests)
-  let bestScore = scoreMap(guests, groups, tables, constraints, weights, bestAssignment)
+  let bestAssignment: Map<string, { tableId: string; seatIndex: number } | null>
+  let bestScore: ReturnType<typeof scoreMap>
+
+  if (!keepCurrentAssignment) {
+    bestAssignment = generateRandomAssignment(guests, tables)
+    for (const guest of guests) {
+      if (guest.locked && guest.seat) {
+        bestAssignment.set(guest.id, { ...guest.seat })
+      }
+    }
+    bestScore = scoreMap(guests, groups, tables, constraints, weights, bestAssignment)
+  } else {
+    bestAssignment = cloneAssignment(guests)
+    bestScore = scoreMap(guests, groups, tables, constraints, weights, bestAssignment)
+  }
 
   for (let restart = 0; restart < restarts; restart++) {
     let current: Map<string, { tableId: string; seatIndex: number } | null>

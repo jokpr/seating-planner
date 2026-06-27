@@ -42,14 +42,20 @@ export function Seat({
   const addConstraint = useSeatingStore((s) => s.addConstraint)
 
   const isLinking = linkType !== null
-  const isLinkSource = guest?.id === linkSourceId
-  const isPickable = isLinking && !!guest && !isLinkSource
+  const isLinkSource = guest?.id === linkSourceId && linkSourceId !== '__toolbar__'
+  const isPickable = isLinking && !!guest && guest.id !== linkSourceId
 
   const handleGuestClick = () => {
     if (!guest) return
     if (isLinking && linkType) {
       if (guest.id === linkSourceId) {
         cancelLink()
+        return
+      }
+      // Toolbar-initiated rule: first click sets source, second sets target
+      if (linkSourceId === '__toolbar__') {
+        useUiStore.getState().startLink(guest.id, linkType)
+        showToast(`Now click the guest who ${RULE_META[linkType].verb} ${guest.name}.`)
         return
       }
       addConstraint(linkType, { guestA: linkSourceId!, guestB: guest.id })
@@ -65,6 +71,7 @@ export function Seat({
   return (
     <div
       ref={setNodeRef}
+      data-no-pan
       className="absolute -translate-x-1/2 -translate-y-1/2"
       style={{ left: x, top: y }}
     >

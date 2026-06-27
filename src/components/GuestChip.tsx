@@ -42,6 +42,7 @@ export function GuestChip({
     <div
       ref={setNodeRef}
       style={style}
+      data-no-pan
       {...listeners}
       {...attributes}
       onClick={

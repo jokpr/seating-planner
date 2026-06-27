@@ -35,6 +35,7 @@ interface SeatingStore extends SeatingPlanState {
 
   // Tables
   addTable: (name: string, shape: TableShape, capacity: number) => void
+  addTableAt: (name: string, shape: TableShape, capacity: number, x: number, y: number) => void
   updateTable: (id: string, updates: Partial<Omit<Table, 'id'>>) => void
   removeTable: (id: string) => void
   moveTable: (id: string, x: number, y: number) => void
@@ -202,6 +203,21 @@ export const useSeatingStore = create<SeatingStore>()(
           }
         }),
 
+      addTableAt: (name, shape, capacity, x, y) =>
+        set((s) => ({
+          tables: [
+            ...s.tables,
+            {
+              id: createId(),
+              name: name.trim() || `Table ${s.tables.length + 1}`,
+              shape,
+              capacity,
+              x: Math.max(0, Math.round(x)),
+              y: Math.max(0, Math.round(y)),
+            },
+          ],
+        })),
+
       updateTable: (id, updates) =>
         set((s) => ({
           tables: s.tables.map((t) => (t.id === id ? { ...t, ...updates } : t)),
@@ -217,7 +233,11 @@ export const useSeatingStore = create<SeatingStore>()(
 
       moveTable: (id, x, y) =>
         set((s) => ({
-          tables: s.tables.map((t) => (t.id === id ? { ...t, x, y } : t)),
+          tables: s.tables.map((t) =>
+            t.id === id
+              ? { ...t, x: Math.max(0, Math.round(x)), y: Math.max(0, Math.round(y)) }
+              : t,
+          ),
         })),
 
       addConstraint: (type, pair) =>

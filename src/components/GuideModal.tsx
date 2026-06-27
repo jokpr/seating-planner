@@ -14,13 +14,13 @@ import { useSeatingStore } from '../store/useSeatingStore'
 const STEPS = [
   {
     icon: UserPlus,
-    title: 'Add tables & guests',
-    body: 'Use the sidebar tabs to create tables (round, rectangular, or a head table) and add your guest list. Group guests into households so they stay together.',
+    title: 'Add from the canvas toolbar',
+    body: 'Type a guest name and click Add, or drag table shapes onto the floor plan. The sidebar is still there for advanced options.',
   },
   {
     icon: Hand,
     title: 'Drag people into seats',
-    body: 'Drag a guest from the pool onto any seat. Drop one guest on another to swap them, or drag back to the pool to unassign.',
+    body: 'Drag guests from the dock at the bottom onto any seat. Drop back in the dock to unassign. Drag tables by their handle to rearrange the room.',
   },
   {
     icon: MousePointerClick,
@@ -30,7 +30,7 @@ const STEPS = [
   {
     icon: Ban,
     title: 'Create rules in two clicks',
-    body: 'From a guest\'s menu pick a rule (can\'t share a table, can\'t sit next to, or keep together), then click the other guest. Conflicts highlight in red instantly.',
+    body: 'Pick a rule from the canvas toolbar or a guest menu, then click two guests on the map. Conflicts highlight in red instantly.',
   },
   {
     icon: Lock,
@@ -40,7 +40,7 @@ const STEPS = [
   {
     icon: Sparkles,
     title: 'Auto-arrange the rest',
-    body: 'Hit Auto-arrange to seat everyone optimally, or Reseat unlocked to reshuffle only the unlocked guests. Export to JSON or a shareable PNG anytime.',
+    body: 'Hit Auto-arrange to seat everyone optimally, or Reseat unlocked to reshuffle only unlocked guests. Export a shareable PNG anytime.',
   },
 ]
 

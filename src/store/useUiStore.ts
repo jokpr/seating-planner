@@ -34,6 +34,10 @@ interface UiStore {
   toast: string | null
   /** Whether the help guide is open */
   guideOpen: boolean
+  /** Canvas pan offset in pixels */
+  canvasPan: { x: number; y: number }
+  /** Selected table for inline editing */
+  selectedTableId: string | null
 
   openMenu: (guestId: string) => void
   closeMenu: () => void
@@ -42,6 +46,9 @@ interface UiStore {
   showToast: (message: string) => void
   clearToast: () => void
   setGuideOpen: (open: boolean) => void
+  setCanvasPan: (pan: { x: number; y: number }) => void
+  nudgeCanvasPan: (dx: number, dy: number) => void
+  setSelectedTableId: (tableId: string | null) => void
 }
 
 let toastTimer: ReturnType<typeof setTimeout> | null = null
@@ -52,6 +59,8 @@ export const useUiStore = create<UiStore>((set) => ({
   linkType: null,
   toast: null,
   guideOpen: false,
+  canvasPan: { x: 0, y: 0 },
+  selectedTableId: null,
 
   openMenu: (guestId) => set({ menuGuestId: guestId }),
   closeMenu: () => set({ menuGuestId: null }),
@@ -68,4 +77,8 @@ export const useUiStore = create<UiStore>((set) => ({
   clearToast: () => set({ toast: null }),
 
   setGuideOpen: (open) => set({ guideOpen: open }),
+  setCanvasPan: (pan) => set({ canvasPan: pan }),
+  nudgeCanvasPan: (dx, dy) =>
+    set((s) => ({ canvasPan: { x: s.canvasPan.x + dx, y: s.canvasPan.y + dy } })),
+  setSelectedTableId: (tableId) => set({ selectedTableId: tableId }),
 }))

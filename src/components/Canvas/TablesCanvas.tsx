@@ -1,9 +1,12 @@
+import { useCallback, useRef } from 'react'
 import { useDroppable } from '@dnd-kit/core'
-import { Sparkles, Wand2, X } from 'lucide-react'
+import { Sparkles, Wand2, X, Move } from 'lucide-react'
 import { useSeatingStore } from '../../store/useSeatingStore'
 import { useUiStore, RULE_META } from '../../store/useUiStore'
 import { useGuestConflictIds, useTableConflictIds } from '../../hooks/useConflicts'
 import { getTableDimensions } from '../../lib/seating/layout'
+import { CANVAS_DROP_ID } from '../../lib/dnd/types'
+import { CanvasToolbar, CanvasGuestDock } from './CanvasToolbar'
 import { TableView } from './TableView'
 
 export function TablesCanvas() {
@@ -19,32 +22,157 @@ export function TablesCanvas() {
   const linkSourceId = useUiStore((s) => s.linkSourceId)
   const cancelLink = useUiStore((s) => s.cancelLink)
   const setGuideOpen = useUiStore((s) => s.setGuideOpen)
+  const canvasPan = useUiStore((s) => s.canvasPan)
+  const setSelectedTableId = useUiStore((s) => s.setSelectedTableId)
 
-  const linkSourceName = guests.find((g) => g.id === linkSourceId)?.name
+  const viewportRef = useRef<HTMLDivElement>(null)
+  const panState = useRef<{ active: boolean; startX: number; startY: number; panX: number; panY: number } | null>(
+    null,
+  )
 
-  // Size the inner area to fit all tables.
+  const linkSourceName =
+    linkSourceId && linkSourceId !== '__toolbar__'
+      ? guests.find((g) => g.id === linkSourceId)?.name
+      : null
+
   const bounds = tables.reduce(
     (acc, t) => {
       const d = getTableDimensions(t)
       return {
-        w: Math.max(acc.w, t.x + d.width + 80),
-        h: Math.max(acc.h, t.y + d.height + 80),
+        w: Math.max(acc.w, t.x + d.width + 120),
+        h: Math.max(acc.h, t.y + d.height + 200),
       }
     },
-    { w: 900, h: 560 },
+    { w: 1200, h: 800 },
   )
 
   const showOnboarding = guests.length === 0
 
+  const handlePanPointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      if (e.button !== 0 && e.button !== 1) return
+      const target = e.target as HTMLElement
+      if (target.closest('[data-no-pan]')) return
+      if (target.closest('button, input, select, textarea, [role="button"]')) return
+
+      e.currentTarget.setPointerCapture(e.pointerId)
+      panState.current = {
+        active: true,
+        startX: e.clientX,
+        startY: e.clientY,
+        panX: canvasPan.x,
+        panY: canvasPan.y,
+      }
+    },
+    [canvasPan.x, canvasPan.y],
+  )
+
+  const handlePanPointerMove = useCallback((e: React.PointerEvent) => {
+    if (!panState.current?.active) return
+    const dx = e.clientX - panState.current.startX
+    const dy = e.clientY - panState.current.startY
+    useUiStore.getState().setCanvasPan({
+      x: panState.current.panX + dx,
+      y: panState.current.panY + dy,
+    })
+  }, [])
+
+  const handlePanPointerUp = useCallback((e: React.PointerEvent) => {
+    if (panState.current?.active) {
+      panState.current = null
+      e.currentTarget.releasePointerCapture(e.pointerId)
+    }
+  }, [])
+
+  const handleBackgroundClick = useCallback(() => {
+    setSelectedTableId(null)
+  }, [setSelectedTableId])
+
   return (
-    <div className="relative h-full min-h-[560px] flex-1 overflow-auto rounded-2xl border border-border bg-gradient-to-br from-cream via-white to-cream/50 p-6 scrollbar-thin">
+    <div className="canvas-floor relative h-full min-h-[560px] flex-1 overflow-hidden rounded-2xl border border-border shadow-inner">
+      <div
+        ref={viewportRef}
+        className="canvas-viewport h-full w-full overflow-auto scrollbar-thin"
+        onPointerDown={handlePanPointerDown}
+        onPointerMove={handlePanPointerMove}
+        onPointerUp={handlePanPointerUp}
+        onPointerCancel={handlePanPointerUp}
+      >
+        <CanvasWorld bounds={bounds} pan={canvasPan} onBackgroundClick={handleBackgroundClick}>
+          {showOnboarding ? (
+            <div className="flex h-full min-h-[560px] items-center justify-center">
+              <div
+                className="max-w-md rounded-2xl border border-border bg-white/90 p-8 text-center shadow-lg backdrop-blur-sm"
+                data-no-pan
+              >
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-rose to-rose-dark text-white">
+                  <Sparkles className="h-6 w-6" />
+                </div>
+                <h2 className="font-serif text-2xl font-semibold text-ink">Let's seat your guests</h2>
+                <p className="mt-2 text-sm text-muted">
+                  Drag tables from the toolbar onto the floor, add guests, then drop them on seats.
+                  Auto-arrange can do the rest.
+                </p>
+                <div className="mt-5 flex flex-wrap justify-center gap-2">
+                  <button
+                    type="button"
+                    onClick={loadDemo}
+                    className="rounded-lg bg-gradient-to-r from-rose to-rose-dark px-4 py-2 text-sm font-medium text-white shadow-sm hover:shadow-md"
+                  >
+                    Load example wedding
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setGuideOpen(true)}
+                    className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-ink hover:bg-cream"
+                  >
+                    How it works
+                  </button>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              {tables.map((table) => (
+                <TableView
+                  key={table.id}
+                  table={table}
+                  guests={guests}
+                  groups={groups}
+                  conflictGuestIds={conflictGuestIds}
+                  conflictTableIds={conflictTableIds}
+                  onToggleLock={toggleGuestLock}
+                />
+              ))}
+            </>
+          )}
+        </CanvasWorld>
+      </div>
+
+      {!showOnboarding && (
+        <>
+          <CanvasToolbar />
+          <CanvasGuestDock />
+        </>
+      )}
+
       {linkType && (
-        <div className="sticky left-0 top-0 z-30 mb-3 flex items-center gap-3 rounded-xl border border-rose/40 bg-white/95 px-4 py-2 shadow-sm backdrop-blur">
+        <div
+          className="pointer-events-auto absolute left-1/2 top-3 z-30 flex -translate-x-1/2 items-center gap-3 rounded-xl border border-rose/40 bg-white/95 px-4 py-2 shadow-lg backdrop-blur"
+          data-no-pan
+        >
           <Wand2 className="h-4 w-4 text-rose-dark" />
           <span className="text-sm text-ink">
-            Creating rule —{' '}
-            <strong>{linkSourceName}</strong> {RULE_META[linkType].verb}…{' '}
-            <span className="text-muted">click another guest on the map</span>
+            {linkSourceName ? (
+              <>
+                Creating rule — <strong>{linkSourceName}</strong> {RULE_META[linkType].verb}…{' '}
+                <span className="text-muted">click another guest</span>
+              </>
+            ) : (
+              <>
+                Creating rule — <span className="text-muted">click two guests on the map</span>
+              </>
+            )}
           </span>
           <button
             type="button"
@@ -56,50 +184,53 @@ export function TablesCanvas() {
         </div>
       )}
 
-      {showOnboarding ? (
-        <div className="flex h-full items-center justify-center">
-          <div className="max-w-md rounded-2xl border border-border bg-white/80 p-8 text-center shadow-sm">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-rose to-rose-dark text-white">
-              <Sparkles className="h-6 w-6" />
-            </div>
-            <h2 className="font-serif text-2xl font-semibold text-ink">Let's seat your guests</h2>
-            <p className="mt-2 text-sm text-muted">
-              Add guests from the <strong>Guests</strong> tab, then drag them onto seats — or let
-              Auto-arrange do it for you. You already have a few tables to start with.
-            </p>
-            <div className="mt-5 flex flex-wrap justify-center gap-2">
-              <button
-                type="button"
-                onClick={loadDemo}
-                className="rounded-lg bg-gradient-to-r from-rose to-rose-dark px-4 py-2 text-sm font-medium text-white shadow-sm hover:shadow-md"
-              >
-                Load example wedding
-              </button>
-              <button
-                type="button"
-                onClick={() => setGuideOpen(true)}
-                className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-ink hover:bg-cream"
-              >
-                How it works
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="relative" style={{ minWidth: bounds.w, minHeight: bounds.h }}>
-          {tables.map((table) => (
-            <TableView
-              key={table.id}
-              table={table}
-              guests={guests}
-              groups={groups}
-              conflictGuestIds={conflictGuestIds}
-              conflictTableIds={conflictTableIds}
-              onToggleLock={toggleGuestLock}
-            />
-          ))}
+      {!showOnboarding && guests.filter((g) => !g.seat).length === 0 && (
+        <div className="pointer-events-none absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 text-[10px] text-muted shadow-sm backdrop-blur">
+          <Move className="h-3 w-3" />
+          Drag empty floor to pan
         </div>
       )}
+    </div>
+  )
+}
+
+function CanvasWorld({
+  bounds,
+  pan,
+  children,
+  onBackgroundClick,
+}: {
+  bounds: { w: number; h: number }
+  pan: { x: number; y: number }
+  children: React.ReactNode
+  onBackgroundClick: () => void
+}) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: CANVAS_DROP_ID,
+    data: { type: 'canvas' },
+  })
+
+  return (
+    <div
+      ref={setNodeRef}
+      data-canvas-world
+      className={`canvas-world relative min-h-full ${isOver ? 'ring-2 ring-inset ring-rose/30' : ''}`}
+      style={{
+        minWidth: bounds.w,
+        minHeight: bounds.h,
+        transform: `translate(${pan.x}px, ${pan.y}px)`,
+        backgroundImage: `
+          radial-gradient(circle at 20% 20%, rgba(232, 160, 191, 0.08) 0%, transparent 50%),
+          radial-gradient(circle at 80% 80%, rgba(143, 166, 143, 0.08) 0%, transparent 50%),
+          linear-gradient(to right, rgba(232, 228, 223, 0.4) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(232, 228, 223, 0.4) 1px, transparent 1px)
+        `,
+        backgroundSize: '100% 100%, 100% 100%, 40px 40px, 40px 40px',
+        backgroundColor: 'var(--color-cream)',
+      }}
+      onClick={onBackgroundClick}
+    >
+      {children}
     </div>
   )
 }
@@ -113,8 +244,9 @@ export function GuestPoolDropZone({ children }: { children: React.ReactNode }) {
   return (
     <div
       ref={setNodeRef}
-      className={`min-h-[80px] rounded-xl border-2 border-dashed p-3 transition-colors ${
-        isOver ? 'border-rose bg-rose/10' : 'border-border bg-white/50'
+      data-no-pan
+      className={`min-h-[72px] rounded-2xl border-2 border-dashed p-3 shadow-lg backdrop-blur-md transition-colors ${
+        isOver ? 'border-rose bg-rose/10' : 'border-border/80 bg-white/95'
       }`}
     >
       {children}

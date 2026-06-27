@@ -162,6 +162,19 @@ export function scoreAssignment(
     }
   }
 
+  // Unassigned guest penalty — strongly prefer seating everyone when capacity allows
+  const totalCapacity = tables.reduce((sum, t) => sum + t.capacity, 0)
+  const totalAssigned = [...assignment.byGuest.values()].filter(Boolean).length
+  const hasCapacity = totalAssigned < totalCapacity
+
+  for (const guest of guests) {
+    if (guest.locked) continue
+    const seated = assignment.byGuest.get(guest.id)
+    if (!seated && hasCapacity) {
+      cost += HARD_PENALTY
+    }
+  }
+
   return { cost, conflicts }
 }
 
