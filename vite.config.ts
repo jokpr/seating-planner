@@ -20,6 +20,7 @@ function seoTransformPlugin(mode: string) {
     },
     closeBundle() {
       const today = new Date().toISOString().slice(0, 10)
+      const legalPaths = ['/legal/privacy.html', '/legal/terms.html', '/legal/imprint.html']
       const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
@@ -28,6 +29,16 @@ function seoTransformPlugin(mode: string) {
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
+${legalPaths
+  .map(
+    (path) => `  <url>
+    <loc>${siteUrl}${path}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>`,
+  )
+  .join('\n')}
 </urlset>
 `
       writeFileSync(resolve('dist/sitemap.xml'), sitemap)

@@ -7,6 +7,7 @@ import { ConstraintsManager } from './ConstraintsManager'
 import { WeightsPanel } from './WeightsPanel'
 import { useUiStore } from '../../store/useUiStore'
 import { useIsMobile } from '../../hooks/useMediaQuery'
+import { CONTACT_EMAIL, LEGAL_PAGES } from '../../lib/legal'
 
 type Tab = 'guests' | 'groups' | 'tables' | 'rules' | 'weights'
 
@@ -17,6 +18,28 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'rules', label: 'Rules' },
   { id: 'weights', label: 'Weights' },
 ]
+
+function SidebarLegalLinks() {
+  return (
+    <nav
+      className="shrink-0 border-t border-border px-2 py-1 text-[10px] leading-snug text-muted"
+      aria-label="Legal"
+    >
+      {Object.values(LEGAL_PAGES).map(({ path, label }, i) => (
+        <span key={path}>
+          {i > 0 && <span className="text-border"> · </span>}
+          <a href={path} className="hover:text-ink">
+            {label}
+          </a>
+        </span>
+      ))}
+      <span className="text-border"> · </span>
+      <a href={`mailto:${CONTACT_EMAIL}`} className="hover:text-ink">
+        Contact
+      </a>
+    </nav>
+  )
+}
 
 function SidebarTabs({
   activeTab,
@@ -65,6 +88,9 @@ export function SidebarContent() {
       <SidebarTabs activeTab={activeTab} onTabChange={setActiveTab} />
       <div className="mt-4">
         <SidebarPanel activeTab={activeTab} />
+      </div>
+      <div className="mt-4 md:hidden">
+        <SidebarLegalLinks />
       </div>
     </>
   )
@@ -118,6 +144,7 @@ export function Sidebar() {
       <div className="flex-1 overflow-y-auto p-2.5 scrollbar-thin">
         <SidebarPanel activeTab={activeTab} />
       </div>
+      <SidebarLegalLinks />
     </aside>
   )
 }

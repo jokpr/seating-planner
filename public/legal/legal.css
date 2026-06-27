@@ -1,0 +1,84 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.65;
+  color: #1a1a2e;
+  background: #faf8f5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: #c77d9e;
+}
+
+a:hover {
+  color: #1a1a2e;
+}
+
+.wrap {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 2rem 1.25rem 3rem;
+}
+
+header {
+  margin-bottom: 2rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #e8e4df;
+}
+
+header h1 {
+  margin: 0 0 0.25rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+}
+
+header p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+
+nav {
+  margin-top: 0.75rem;
+  font-size: 0.8125rem;
+}
+
+nav a + a::before {
+  content: ' · ';
+  color: #6b7280;
+}
+
+h2 {
+  margin: 1.75rem 0 0.5rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+p,
+ul {
+  margin: 0 0 0.75rem;
+}
+
+ul {
+  padding-left: 1.25rem;
+}
+
+li + li {
+  margin-top: 0.25rem;
+}
+
+footer {
+  margin-top: 2.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e8e4df;
+  font-size: 0.8125rem;
+  color: #6b7280;
+}
