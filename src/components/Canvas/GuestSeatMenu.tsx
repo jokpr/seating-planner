@@ -12,49 +12,134 @@ const RULE_ICON: Record<RuleType, typeof Ban> = {
   mustSitTogether: Heart,
 }
 
-const MENU_WIDTH = 256
 const VIEWPORT_PADDING = 8
 const ANCHOR_GAP = 8
 
-function computeAnchoredPosition(
+type MenuSide = 'bottom' | 'top' | 'left' | 'right'
+
+function clamp(value: number, min: number, max: number) {
+  return Math.max(min, Math.min(value, max))
+}
+
+function availableSpace(side: MenuSide, anchorRect: DOMRect) {
+  const vw = window.innerWidth
+  const vh = window.innerHeight
+
+  switch (side) {
+    case 'bottom':
+      return vh - VIEWPORT_PADDING - (anchorRect.bottom + ANCHOR_GAP)
+    case 'top':
+      return anchorRect.top - ANCHOR_GAP - VIEWPORT_PADDING
+    case 'right':
+      return vw - VIEWPORT_PADDING - (anchorRect.right + ANCHOR_GAP)
+    case 'left':
+      return anchorRect.left - ANCHOR_GAP - VIEWPORT_PADDING
+  }
+}
+
+function sideFits(
+  side: MenuSide,
   anchorRect: DOMRect,
+  menuWidth: number,
   menuHeight: number,
-  preferredPlacement: 'top' | 'bottom',
+) {
+  const space = availableSpace(side, anchorRect)
+  return side === 'left' || side === 'right' ? space >= menuWidth : space >= menuHeight
+}
+
+function positionForSide(
+  side: MenuSide,
+  anchorRect: DOMRect,
+  menuWidth: number,
+  menuHeight: number,
 ) {
   const vw = window.innerWidth
   const vh = window.innerHeight
 
-  let left = anchorRect.left + anchorRect.width / 2 - MENU_WIDTH / 2
-  left = Math.max(VIEWPORT_PADDING, Math.min(left, vw - MENU_WIDTH - VIEWPORT_PADDING))
+  switch (side) {
+    case 'bottom':
+      return {
+        top: clamp(anchorRect.bottom + ANCHOR_GAP, VIEWPORT_PADDING, vh - VIEWPORT_PADDING - menuHeight),
+        left: clamp(
+          anchorRect.left + anchorRect.width / 2 - menuWidth / 2,
+          VIEWPORT_PADDING,
+          vw - VIEWPORT_PADDING - menuWidth,
+        ),
+      }
+    case 'top':
+      return {
+        top: clamp(
+          anchorRect.top - ANCHOR_GAP - menuHeight,
+          VIEWPORT_PADDING,
+          vh - VIEWPORT_PADDING - menuHeight,
+        ),
+        left: clamp(
+          anchorRect.left + anchorRect.width / 2 - menuWidth / 2,
+          VIEWPORT_PADDING,
+          vw - VIEWPORT_PADDING - menuWidth,
+        ),
+      }
+    case 'right':
+      return {
+        top: clamp(
+          anchorRect.top + anchorRect.height / 2 - menuHeight / 2,
+          VIEWPORT_PADDING,
+          vh - VIEWPORT_PADDING - menuHeight,
+        ),
+        left: clamp(
+          anchorRect.right + ANCHOR_GAP,
+          VIEWPORT_PADDING,
+          vw - VIEWPORT_PADDING - menuWidth,
+        ),
+      }
+    case 'left':
+      return {
+        top: clamp(
+          anchorRect.top + anchorRect.height / 2 - menuHeight / 2,
+          VIEWPORT_PADDING,
+          vh - VIEWPORT_PADDING - menuHeight,
+        ),
+        left: clamp(
+          anchorRect.left - ANCHOR_GAP - menuWidth,
+          VIEWPORT_PADDING,
+          vw - VIEWPORT_PADDING - menuWidth,
+        ),
+      }
+  }
+}
 
-  const spaceBelow = vh - VIEWPORT_PADDING - (anchorRect.bottom + ANCHOR_GAP)
-  const spaceAbove = anchorRect.top - ANCHOR_GAP - VIEWPORT_PADDING
+function computeAnchoredPosition(
+  anchorRect: DOMRect,
+  menuWidth: number,
+  menuHeight: number,
+  preferredPlacement: 'top' | 'bottom',
+) {
+  const primary: MenuSide = preferredPlacement === 'bottom' ? 'bottom' : 'top'
+  const secondary: MenuSide = preferredPlacement === 'bottom' ? 'top' : 'bottom'
 
-  const preferBelow = preferredPlacement === 'bottom'
-  const placeBelow =
-    preferBelow
-      ? spaceBelow >= menuHeight || spaceBelow >= spaceAbove
-      : spaceBelow > spaceAbove && spaceBelow >= menuHeight
-
-  if (placeBelow) {
-    return {
-      top: anchorRect.bottom + ANCHOR_GAP,
-      left,
-      maxHeight: Math.max(160, spaceBelow),
-    }
+  if (sideFits(primary, anchorRect, menuWidth, menuHeight)) {
+    return positionForSide(primary, anchorRect, menuWidth, menuHeight)
+  }
+  if (sideFits(secondary, anchorRect, menuWidth, menuHeight)) {
+    return positionForSide(secondary, anchorRect, menuWidth, menuHeight)
   }
 
-  const visibleHeight = Math.min(menuHeight, spaceAbove)
-  let top = anchorRect.top - ANCHOR_GAP - visibleHeight
-  if (top < VIEWPORT_PADDING) {
-    top = VIEWPORT_PADDING
+  const rightFits = sideFits('right', anchorRect, menuWidth, menuHeight)
+  const leftFits = sideFits('left', anchorRect, menuWidth, menuHeight)
+  if (rightFits || leftFits) {
+    const side =
+      rightFits &&
+      (!leftFits || availableSpace('right', anchorRect) >= availableSpace('left', anchorRect))
+        ? 'right'
+        : 'left'
+    return positionForSide(side, anchorRect, menuWidth, menuHeight)
   }
 
-  return {
-    top,
-    left,
-    maxHeight: Math.max(160, anchorRect.top - ANCHOR_GAP - top),
-  }
+  const bestSide = (['right', 'left', primary, secondary] as const).reduce((best, side) =>
+    availableSpace(side, anchorRect) > availableSpace(best, anchorRect) ? side : best,
+  )
+
+  return positionForSide(bestSide, anchorRect, menuWidth, menuHeight)
 }
 
 export function GuestSeatMenu({
@@ -80,7 +165,6 @@ export function GuestSeatMenu({
   const [menuPosition, setMenuPosition] = useState<{
     top: number
     left: number
-    maxHeight: number
   } | null>(null)
   const canvasPan = useUiStore((s) => s.canvasPan)
 
@@ -92,8 +176,14 @@ export function GuestSeatMenu({
       const menu = menuRef.current
       if (!anchor || !menu) return
       const anchorRect = anchor.getBoundingClientRect()
-      const menuHeight = menu.offsetHeight
-      setMenuPosition(computeAnchoredPosition(anchorRect, menuHeight, placement))
+      setMenuPosition(
+        computeAnchoredPosition(
+          anchorRect,
+          menu.offsetWidth,
+          menu.offsetHeight,
+          placement,
+        ),
+      )
     }
 
     updatePosition()
@@ -279,7 +369,7 @@ export function GuestSeatMenu({
       />
       <div
         ref={menuRef}
-        className={`fixed z-[70] w-64 overflow-y-auto overscroll-contain rounded-2xl border border-border bg-white shadow-2xl scrollbar-thin ${
+        className={`fixed z-[70] w-64 overflow-hidden rounded-2xl border border-border bg-white shadow-2xl ${
           menuPosition ? '' : 'invisible'
         }`}
         style={
@@ -287,7 +377,6 @@ export function GuestSeatMenu({
             ? {
                 top: menuPosition.top,
                 left: menuPosition.left,
-                maxHeight: menuPosition.maxHeight,
               }
             : { top: 0, left: 0 }
         }
