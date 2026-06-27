@@ -1,5 +1,10 @@
 import { create } from 'zustand'
 import type { Constraints } from '../types'
+import {
+  getStoredTheme,
+  persistTheme,
+  type ThemePreference,
+} from '../lib/theme'
 
 export type RuleType = keyof Constraints
 
@@ -42,6 +47,8 @@ interface UiStore {
   sidebarCollapsed: boolean
   /** Mobile bottom sheet panel */
   mobileSheet: 'plan' | 'tools' | 'more' | null
+  /** Color theme preference */
+  theme: ThemePreference
 
   openMenu: (guestId: string) => void
   closeMenu: () => void
@@ -56,6 +63,7 @@ interface UiStore {
   setSidebarCollapsed: (collapsed: boolean) => void
   setMobileSheet: (sheet: 'plan' | 'tools' | 'more' | null) => void
   toggleMobileSheet: (sheet: 'plan' | 'tools' | 'more') => void
+  setTheme: (theme: ThemePreference) => void
 }
 
 let toastTimer: ReturnType<typeof setTimeout> | null = null
@@ -70,6 +78,7 @@ export const useUiStore = create<UiStore>((set) => ({
   selectedTableId: null,
   sidebarCollapsed: true,
   mobileSheet: null,
+  theme: getStoredTheme(),
 
   openMenu: (guestId) => set({ menuGuestId: guestId }),
   closeMenu: () => set({ menuGuestId: null }),
@@ -94,4 +103,8 @@ export const useUiStore = create<UiStore>((set) => ({
   setMobileSheet: (sheet) => set({ mobileSheet: sheet }),
   toggleMobileSheet: (sheet) =>
     set((s) => ({ mobileSheet: s.mobileSheet === sheet ? null : sheet })),
+  setTheme: (theme) => {
+    persistTheme(theme)
+    set({ theme })
+  },
 }))

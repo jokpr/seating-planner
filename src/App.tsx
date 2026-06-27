@@ -170,11 +170,11 @@ function App() {
             group={activeGuest.groupId ? groupMap.get(activeGuest.groupId) : undefined}
           />
         ) : activeTable ? (
-          <div className="rounded-xl border border-rose/30 bg-white/35 px-3 py-1.5 text-sm font-semibold shadow-md backdrop-blur-md">
+          <div className="rounded-xl border border-rose/30 bg-surface/35 px-3 py-1.5 text-sm font-semibold shadow-md backdrop-blur-md">
             {activeTable.name}
           </div>
         ) : activeTemplate ? (
-          <div className="flex items-center gap-2 rounded-xl border border-rose/30 bg-white/35 px-3 py-1.5 text-sm font-medium shadow-md backdrop-blur-md">
+          <div className="flex items-center gap-2 rounded-xl border border-rose/30 bg-surface/35 px-3 py-1.5 text-sm font-medium shadow-md backdrop-blur-md">
             <TemplateIcon shape={activeTemplate.shape} />
             New {activeTemplate.shape} table ({activeTemplate.capacity})
           </div>

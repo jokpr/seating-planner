@@ -15,6 +15,7 @@ import { useConflicts } from '../hooks/useConflicts'
 import { useIsMobile } from '../hooks/useMediaQuery'
 import { exportPlanAsPng } from '../lib/export/exportImage'
 import { importPlanFile } from '../lib/export/importPlan'
+import { ThemeSelector } from './ThemeSelector'
 
 interface TopBarProps {
   exportViewRef: React.RefObject<HTMLDivElement | null>
@@ -81,7 +82,7 @@ export function TopBar({ exportViewRef }: TopBarProps) {
   if (isMobile) {
     return (
       <header
-        className="flex shrink-0 items-center gap-2 border-b border-border bg-white px-3 py-1.5 shadow-sm"
+        className="flex shrink-0 items-center gap-2 border-b border-border bg-surface px-3 py-1.5 shadow-sm"
         style={{ paddingTop: 'max(0.375rem, env(safe-area-inset-top))' }}
       >
         <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-rose to-rose-dark text-white">
@@ -97,7 +98,7 @@ export function TopBar({ exportViewRef }: TopBarProps) {
           />
         </div>
         {conflicts.length > 0 && (
-          <span className="shrink-0 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-medium text-red-700">
+          <span className="shrink-0 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-medium text-red-700 dark:bg-red-950/60 dark:text-red-300">
             {conflicts.length}
           </span>
         )}
@@ -106,6 +107,7 @@ export function TopBar({ exportViewRef }: TopBarProps) {
             {status}
           </span>
         )}
+        <ThemeSelector compact />
         <button
           type="button"
           onClick={() => setGuideOpen(true)}
@@ -119,7 +121,7 @@ export function TopBar({ exportViewRef }: TopBarProps) {
   }
 
   return (
-    <header className="flex items-center gap-3 border-b border-border bg-white px-4 py-1.5 shadow-sm">
+    <header className="flex items-center gap-3 border-b border-border bg-surface px-4 py-1.5 shadow-sm">
       <div className="flex items-center gap-2">
         <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-rose to-rose-dark text-white">
           <Sparkles className="h-3.5 w-3.5" />
@@ -141,7 +143,7 @@ export function TopBar({ exportViewRef }: TopBarProps) {
 
       <div className="ml-auto flex flex-wrap items-center justify-end gap-1.5">
         {conflicts.length > 0 && (
-          <span className="rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-medium text-red-700">
+          <span className="rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-medium text-red-700 dark:bg-red-950/60 dark:text-red-300">
             {conflicts.length} conflict{conflicts.length !== 1 ? 's' : ''}
           </span>
         )}
@@ -168,7 +170,7 @@ export function TopBar({ exportViewRef }: TopBarProps) {
           type="button"
           onClick={handleReseatUnlocked}
           disabled={isRunning}
-          className="flex items-center gap-1 rounded-lg border border-border bg-white px-2.5 py-1.5 text-xs font-medium text-ink transition hover:bg-cream disabled:opacity-60"
+          className="flex items-center gap-1 rounded-lg border border-border bg-surface px-2.5 py-1.5 text-xs font-medium text-ink transition hover:bg-cream disabled:opacity-60"
         >
           <RefreshCw className="h-3.5 w-3.5" />
           Reseat unlocked
@@ -211,6 +213,8 @@ export function TopBar({ exportViewRef }: TopBarProps) {
             <Trash2 className="h-3.5 w-3.5" />
           </button>
         )}
+
+        <ThemeSelector />
 
         <button
           type="button"

@@ -48,7 +48,7 @@ export function ConstraintsManager() {
 
       <div className="space-y-4">
         {CONSTRAINT_TYPES.map(({ key, label, description, icon: Icon }) => (
-          <div key={key} className="rounded-lg border border-border bg-white p-3">
+          <div key={key} className="rounded-lg border border-border bg-surface p-3">
             <div className="mb-2 flex items-center gap-2">
               <Icon className="h-3.5 w-3.5 text-muted" />
               <span className="text-xs font-semibold">{label}</span>
@@ -107,7 +107,7 @@ function ConstraintAdder({
       <select
         value={guestA}
         onChange={(e) => setGuestA(e.target.value)}
-        className="flex-1 rounded border border-border bg-white px-1 py-1 text-xs"
+        className="flex-1 rounded border border-border bg-surface px-1 py-1 text-xs"
       >
         <option value="">Guest A</option>
         {guests.map((g) => (
@@ -119,7 +119,7 @@ function ConstraintAdder({
       <select
         value={guestB}
         onChange={(e) => setGuestB(e.target.value)}
-        className="flex-1 rounded border border-border bg-white px-1 py-1 text-xs"
+        className="flex-1 rounded border border-border bg-surface px-1 py-1 text-xs"
       >
         <option value="">Guest B</option>
         {guests.map((g) => (

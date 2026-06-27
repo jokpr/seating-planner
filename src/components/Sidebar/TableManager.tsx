@@ -31,7 +31,7 @@ export function TableManager() {
         <h3 className="text-sm font-semibold text-ink">Tables</h3>
       </div>
 
-      <div className="mb-3 space-y-2 rounded-lg border border-border bg-white p-3">
+      <div className="mb-3 space-y-2 rounded-lg border border-border bg-surface p-3">
         <input
           type="text"
           value={name}
@@ -87,7 +87,7 @@ export function TableManager() {
         {tables.map((table) => (
           <div
             key={table.id}
-            className="flex items-center gap-2 rounded-lg border border-border bg-white px-3 py-2"
+            className="flex items-center gap-2 rounded-lg border border-border bg-surface px-3 py-2"
           >
             <input
               type="text"

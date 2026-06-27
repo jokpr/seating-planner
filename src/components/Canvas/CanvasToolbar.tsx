@@ -155,7 +155,7 @@ export function CanvasToolbar() {
 
   return (
     <div className="pointer-events-auto absolute left-2 top-2 z-20 flex w-[9rem] flex-col gap-1.5">
-      <div className="rounded-lg border border-border/30 bg-white/35 p-2 shadow-sm backdrop-blur-md">
+      <div className="rounded-lg border border-border/30 bg-surface/35 p-2 shadow-sm backdrop-blur-md">
         <p className="mb-1.5 text-[8px] font-semibold uppercase tracking-wider text-muted">
           Quick add
         </p>
@@ -184,7 +184,7 @@ export function CanvasToolbar() {
         )}
       </div>
 
-      <div className="rounded-lg border border-border/30 bg-white/35 p-2 shadow-sm backdrop-blur-md">
+      <div className="rounded-lg border border-border/30 bg-surface/35 p-2 shadow-sm backdrop-blur-md">
         <p className="mb-1.5 text-[8px] font-semibold uppercase tracking-wider text-muted">
           Tables
         </p>
@@ -195,7 +195,7 @@ export function CanvasToolbar() {
         </div>
       </div>
 
-      <div className="rounded-lg border border-border/30 bg-white/35 p-2 shadow-sm backdrop-blur-md">
+      <div className="rounded-lg border border-border/30 bg-surface/35 p-2 shadow-sm backdrop-blur-md">
         <div className="mb-1.5 flex items-center gap-1">
           <Wand2 className="h-2.5 w-2.5 text-rose-dark" />
           <p className="text-[8px] font-semibold uppercase tracking-wider text-muted">
@@ -259,7 +259,7 @@ function TableTemplateChip({
       {...listeners}
       {...attributes}
       className={cn(
-        'flex cursor-grab items-center gap-1 rounded-lg border border-border bg-cream/50 font-medium text-ink shadow-sm transition hover:border-rose/50 hover:bg-white active:cursor-grabbing',
+        'flex cursor-grab items-center gap-1 rounded-lg border border-border bg-cream/50 font-medium text-ink shadow-sm transition hover:border-rose/50 hover:bg-surface active:cursor-grabbing',
         stacked && 'w-full justify-between px-2 py-1.5 text-[10px]',
         large && !stacked && 'min-h-[44px] px-3 py-2 text-sm',
         !large && !stacked && 'px-2 py-1.5 text-[11px]',
@@ -406,7 +406,7 @@ function GuestDockGuestItem({
         type="button"
         onClick={onRemove}
         className={cn(
-          'absolute right-0 top-0 z-10 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-red-500 text-white shadow-sm ring-1 ring-white',
+          'absolute right-0 top-0 z-10 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-red-500 text-white shadow-sm ring-1 ring-surface',
           isMobile ? 'flex' : 'hidden group-hover:flex',
         )}
         title="Remove guest"

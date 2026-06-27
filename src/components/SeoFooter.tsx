@@ -44,7 +44,7 @@ export function SeoFooter() {
   const [expanded, setExpanded] = useState(false)
 
   return (
-    <footer className="shrink-0 border-t border-border bg-white/70 backdrop-blur-sm">
+    <footer className="shrink-0 border-t border-border bg-surface/70 backdrop-blur-sm">
       <div className="px-3 py-1.5">
         <button
           type="button"

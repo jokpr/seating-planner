@@ -98,7 +98,7 @@ export function MobileBottomBar({ exportViewRef }: MobileBottomBarProps) {
       )}
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-[70] border-t border-border/50 bg-white/60 backdrop-blur-md md:hidden"
+        className="fixed inset-x-0 bottom-0 z-[70] border-t border-border/50 bg-surface/60 backdrop-blur-md md:hidden"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
         <div className="grid grid-cols-4 gap-1 px-2 py-1.5">

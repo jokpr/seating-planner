@@ -58,7 +58,7 @@ export function GuideModal() {
       onClick={() => setGuideOpen(false)}
     >
       <div
-        className="max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-t-2xl border border-border bg-white p-5 shadow-2xl scrollbar-thin sm:rounded-2xl sm:p-6"
+        className="max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-t-2xl border border-border bg-surface p-5 shadow-2xl scrollbar-thin sm:rounded-2xl sm:p-6"
         style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}
         onClick={(e) => e.stopPropagation()}
       >

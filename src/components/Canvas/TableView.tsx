@@ -87,7 +87,7 @@ export function TableView({
             value={table.name}
             onChange={(e) => updateTable(table.id, { name: e.target.value })}
             onClick={(e) => e.stopPropagation()}
-            className="max-w-[140px] rounded border border-rose/40 bg-white px-2 py-0.5 text-center text-sm font-semibold outline-none focus:ring-2 focus:ring-rose/30"
+            className="max-w-[140px] rounded border border-rose/40 bg-surface px-2 py-0.5 text-center text-sm font-semibold text-ink outline-none focus:ring-2 focus:ring-rose/30"
           />
         ) : (
           <span>{table.name}</span>
@@ -123,7 +123,7 @@ export function TableView({
               removeTable(table.id)
               setSelectedTableId(null)
             }}
-            className="ml-2 rounded border border-red-200 p-0.5 text-red-500 hover:bg-red-50"
+            className="ml-2 rounded border border-red-200 p-0.5 text-red-500 hover:bg-red-50 dark:border-red-800 dark:hover:bg-red-950/40"
             title="Remove table"
           >
             <Trash2 className="h-3 w-3" />
@@ -140,7 +140,7 @@ export function TableView({
       >
         <div
           className={cn(
-            'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-grab border-2 bg-gradient-to-br from-white to-cream/80 shadow-md backdrop-blur-sm transition active:cursor-grabbing',
+            'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-grab border-2 bg-gradient-to-br from-surface to-cream/80 shadow-md backdrop-blur-sm transition active:cursor-grabbing',
             isDragging ? 'scale-[1.02]' : 'hover:border-rose/50 hover:shadow-lg',
             hasTableConflict ? 'border-red-300' : 'border-border/80',
           )}
@@ -206,7 +206,7 @@ export function TableViewStatic({
       </div>
       <div className="relative mx-auto" style={{ width: dims.width, height: dims.height }}>
         <div
-          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 border-2 border-border/80 bg-white shadow-sm"
+          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 border-2 border-border/80 bg-surface shadow-sm"
           style={
             table.shape === 'round'
               ? { width: roundSize, height: roundSize, borderRadius: '9999px' }
@@ -224,7 +224,7 @@ export function TableViewStatic({
               style={{ left: seat.x, top: seat.y }}
             >
               {guest ? (
-                <div className="flex items-center gap-1 rounded-full border border-border bg-white px-2 py-1 text-xs font-medium shadow-sm">
+                <div className="flex items-center gap-1 rounded-full border border-border bg-surface px-2 py-1 text-xs font-medium text-ink shadow-sm">
                   <span
                     className="h-2 w-2 rounded-full"
                     style={{
@@ -236,7 +236,7 @@ export function TableViewStatic({
                   {guest.name}
                 </div>
               ) : (
-                <div className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-dashed border-border/60 bg-white/80 text-[10px] text-muted">
+                <div className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-dashed border-border/60 bg-surface/80 text-[10px] text-muted">
                   {seat.seatIndex + 1}
                 </div>
               )}

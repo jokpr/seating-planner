@@ -15,14 +15,14 @@ export function ConflictPanel() {
   }
 
   return (
-    <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
-      <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-red-700">
+    <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 dark:border-red-900/60 dark:bg-red-950/30">
+      <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-red-700 dark:text-red-300">
         <AlertTriangle className="h-4 w-4" />
         {conflicts.length} conflict{conflicts.length !== 1 ? 's' : ''}
       </div>
       <ul className="space-y-1">
         {conflicts.map((c: Conflict) => (
-          <li key={c.id} className="text-xs text-red-600">
+          <li key={c.id} className="text-xs text-red-600 dark:text-red-300">
             {c.message}
           </li>
         ))}

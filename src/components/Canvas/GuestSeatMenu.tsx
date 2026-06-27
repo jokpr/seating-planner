@@ -228,7 +228,7 @@ export function GuestSeatMenu({
 
   const menuBody = (
     <>
-      <div className="flex items-center justify-between border-b border-border bg-gradient-to-r from-cream to-white px-3 py-2.5">
+      <div className="flex items-center justify-between border-b border-border bg-gradient-to-r from-cream to-surface px-3 py-2.5">
         <div className="min-w-0">
           <span className="block truncate text-sm font-semibold text-ink">{guest.name}</span>
           <span className="text-[10px] text-muted">
@@ -293,7 +293,7 @@ export function GuestSeatMenu({
               className={`flex items-center gap-1 rounded-full border px-2.5 py-1.5 text-xs transition ${
                 guest.groupId === group.id
                   ? 'border-rose bg-rose/15 text-rose-dark'
-                  : 'border-border bg-white text-ink hover:border-rose/50'
+                  : 'border-border bg-surface text-ink hover:border-rose/50'
               }`}
             >
               <span className="h-2 w-2 rounded-full" style={{ backgroundColor: group.color }} />
@@ -351,7 +351,7 @@ export function GuestSeatMenu({
           role="dialog"
           aria-modal="true"
           aria-label={`Actions for ${guest.name}`}
-          className="absolute inset-x-0 bottom-0 max-h-[min(85dvh,640px)] overflow-y-auto overscroll-contain rounded-t-2xl border border-border bg-white shadow-2xl pb-[env(safe-area-inset-bottom)]"
+          className="absolute inset-x-0 bottom-0 max-h-[min(85dvh,640px)] overflow-y-auto overscroll-contain rounded-t-2xl border border-border bg-surface shadow-2xl pb-[env(safe-area-inset-bottom)]"
           onClick={(e) => e.stopPropagation()}
         >
           {menuBody}
@@ -369,7 +369,7 @@ export function GuestSeatMenu({
       />
       <div
         ref={menuRef}
-        className={`fixed z-[70] w-64 overflow-hidden rounded-2xl border border-border bg-white shadow-2xl ${
+        className={`fixed z-[70] w-64 overflow-hidden rounded-2xl border border-border bg-surface shadow-2xl ${
           menuPosition ? '' : 'invisible'
         }`}
         style={

@@ -104,7 +104,7 @@ export function Seat({
             'flex h-8 w-8 items-center justify-center rounded-full border-2 border-dashed transition-colors',
             isOver
               ? 'scale-110 border-rose bg-rose/20'
-              : 'border-border/60 bg-white/50 hover:border-rose/50',
+              : 'border-border/60 bg-surface/50 hover:border-rose/50',
           )}
         >
           <span className="text-[10px] text-muted">{seatIndex + 1}</span>

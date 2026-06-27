@@ -128,7 +128,7 @@ export function TablesCanvas() {
           {showOnboarding ? (
             <div className="flex h-full min-h-[280px] items-center justify-center px-4 md:min-h-[560px]">
               <div
-                className="max-w-md rounded-2xl border border-border bg-white/90 p-5 text-center shadow-lg backdrop-blur-sm md:p-8"
+                className="max-w-md rounded-2xl border border-border bg-surface/90 p-5 text-center shadow-lg backdrop-blur-sm md:p-8"
                 data-no-pan
               >
                 <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-rose to-rose-dark text-white">
@@ -186,7 +186,7 @@ export function TablesCanvas() {
 
       {linkType && (
         <div
-          className="pointer-events-auto absolute left-2 right-2 top-2 z-30 flex items-center gap-2 rounded-lg border border-rose/30 bg-white/35 px-2.5 py-1.5 shadow-md backdrop-blur-md md:left-1/2 md:right-auto md:top-2 md:max-w-lg md:-translate-x-1/2 md:gap-2 md:px-3"
+          className="pointer-events-auto absolute left-2 right-2 top-2 z-30 flex items-center gap-2 rounded-lg border border-rose/30 bg-surface/35 px-2.5 py-1.5 shadow-md backdrop-blur-md md:left-1/2 md:right-auto md:top-2 md:max-w-lg md:-translate-x-1/2 md:gap-2 md:px-3"
           data-no-pan
         >
           <Wand2 className="h-4 w-4 shrink-0 text-rose-dark" />
@@ -213,7 +213,7 @@ export function TablesCanvas() {
       )}
 
       {!showOnboarding && guests.filter((g) => !g.seat).length === 0 && (
-        <div className="pointer-events-none absolute bottom-[calc(4.125rem+env(safe-area-inset-bottom))] left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 rounded-full border border-border/25 bg-white/30 px-2 py-0.5 text-[9px] text-muted shadow-sm backdrop-blur-md md:bottom-2">
+        <div className="pointer-events-none absolute bottom-[calc(4.125rem+env(safe-area-inset-bottom))] left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 rounded-full border border-border/25 bg-surface/30 px-2 py-0.5 text-[9px] text-muted shadow-sm backdrop-blur-md md:bottom-2">
           <Move className="h-3 w-3" />
           {isMobile ? 'Drag to pan' : 'Drag floor to pan'}
         </div>
@@ -274,7 +274,7 @@ export function GuestPoolDropZone({
       className={cn(
         'rounded-lg border border-dashed shadow-sm backdrop-blur-md transition-colors',
         compact ? 'min-h-[36px] p-1.5' : 'min-h-[48px] p-2',
-        isOver ? 'border-rose bg-rose/10' : 'border-border/30 bg-white/35',
+        isOver ? 'border-rose bg-rose/10' : 'border-border/30 bg-surface/35',
       )}
     >
       {children}

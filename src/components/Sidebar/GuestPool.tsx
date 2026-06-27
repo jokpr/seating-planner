@@ -41,7 +41,7 @@ export function GuestPool() {
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
             placeholder="Guest name..."
-            className="flex-1 rounded-lg border border-border bg-white px-3 py-2 text-sm outline-none focus:border-rose focus:ring-1 focus:ring-rose/30"
+            className="flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-rose focus:ring-1 focus:ring-rose/30"
           />
           <button
             type="button"
@@ -89,7 +89,7 @@ export function GuestPool() {
           {guests.map((guest) => (
             <div
               key={guest.id}
-              className="flex items-center gap-2 rounded-lg border border-border/60 bg-white px-2 py-1.5"
+              className="flex items-center gap-2 rounded-lg border border-border/60 bg-surface px-2 py-1.5"
             >
               <span
                 className="h-2 w-2 shrink-0 rounded-full"
@@ -99,7 +99,7 @@ export function GuestPool() {
                     : '#d1d5db',
                 }}
               />
-              <span className="flex-1 truncate text-xs font-medium">{guest.name}</span>
+              <span className="flex-1 truncate text-xs font-medium text-ink">{guest.name}</span>
               {guest.seat && (
                 <span className="text-[10px] text-muted">seated</span>
               )}

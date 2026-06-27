@@ -25,7 +25,7 @@ export function MobileSheet({ open, onClose, title, children, className }: Mobil
         aria-modal="true"
         aria-label={title}
         className={cn(
-          'absolute inset-x-0 bottom-0 flex max-h-[min(88dvh,720px)] flex-col rounded-t-2xl border border-border bg-white shadow-2xl',
+          'absolute inset-x-0 bottom-0 flex max-h-[min(88dvh,720px)] flex-col rounded-t-2xl border border-border bg-surface shadow-2xl',
           'pb-[env(safe-area-inset-bottom)]',
           className,
         )}

@@ -34,7 +34,7 @@ export function GroupManager() {
           onChange={(e) => setName(e.target.value)}
           onKeyDown={(e) => e.key === 'Enter' && handleAdd()}
           placeholder="Group name..."
-          className="flex-1 rounded-lg border border-border bg-white px-3 py-2 text-sm outline-none focus:border-rose focus:ring-1 focus:ring-rose/30"
+          className="flex-1 rounded-lg border border-border bg-surface px-3 py-2 text-sm outline-none focus:border-rose focus:ring-1 focus:ring-rose/30"
         />
         <button
           type="button"
@@ -51,7 +51,7 @@ export function GroupManager() {
           return (
             <div
               key={group.id}
-              className="rounded-lg border border-border bg-white p-3"
+              className="rounded-lg border border-border bg-surface p-3"
             >
               <div className="mb-2 flex items-center gap-2">
                 <input
@@ -99,8 +99,8 @@ export function GroupManager() {
                   {members.map((m) => (
                     <span
                       key={m.id}
-                      className="rounded-full px-2 py-0.5 text-xs"
-                      style={{ backgroundColor: group.color + '33', color: '#1a1a2e' }}
+                      className="rounded-full px-2 py-0.5 text-xs text-ink"
+                      style={{ backgroundColor: group.color + '33' }}
                     >
                       {m.name}
                     </span>

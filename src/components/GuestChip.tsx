@@ -63,7 +63,7 @@ export function GuestChip({
           : undefined
       }
       className={cn(
-        'group relative flex items-center gap-1.5 rounded-full border bg-gradient-to-br from-white/80 via-white/70 to-cream/40 shadow-sm backdrop-blur-sm transition-all',
+        'group relative flex items-center gap-1.5 rounded-full border bg-gradient-to-br from-surface/90 via-surface/80 to-cream/40 shadow-sm backdrop-blur-sm transition-all',
         compact ? 'px-2 py-1 text-[11px] min-h-[30px]' : 'px-3 py-1.5 text-sm min-h-[36px]',
         guest.locked
           ? 'cursor-pointer opacity-95'
@@ -71,7 +71,7 @@ export function GuestChip({
             ? 'cursor-pointer'
             : 'cursor-grab active:cursor-grabbing',
         hasConflict
-          ? 'border-red-400 ring-2 ring-red-200'
+          ? 'border-red-400 ring-2 ring-red-200 dark:border-red-500 dark:ring-red-900/60'
           : selected
             ? 'border-rose ring-2 ring-rose/40 shadow-md shadow-rose/10'
             : pickable
@@ -82,7 +82,7 @@ export function GuestChip({
     >
       <span
         className={cn(
-          'shrink-0 rounded-full ring-2 ring-white shadow-sm',
+          'shrink-0 rounded-full ring-2 ring-surface shadow-sm',
           compact ? 'h-3 w-3' : 'h-4 w-4',
         )}
         style={{ backgroundColor: group?.color ?? '#d1d5db' }}
