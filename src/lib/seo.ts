@@ -1,7 +1,7 @@
 /** Set VITE_SITE_URL in .env for production canonical URLs and sitemap. */
 export const SITE_URL =
   (import.meta.env.VITE_SITE_URL as string | undefined)?.replace(/\/$/, '') ||
-  'https://seatfinder.app'
+  'https://seat-planner.com'
 
 export const SITE_NAME = 'SeatFinder'
 

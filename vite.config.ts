@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-const DEFAULT_SITE_URL = 'https://seatfinder.app'
+const DEFAULT_SITE_URL = 'https://seat-planner.com'
 
 function siteUrlFromEnv(mode: string) {
   const env = loadEnv(mode, process.cwd(), '')
