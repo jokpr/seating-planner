@@ -9,9 +9,24 @@ const FAQ = [
       'Yes. SeatFinder is completely free to use for weddings, receptions, banquets, galas, and other events. There is no subscription, no signup, and no guest limit.',
   },
   {
+    question: 'How do guest groups work in SeatFinder?',
+    answer:
+      'Create groups for families, households, or friend circles and assign guests to them. The seating algorithm tries to seat everyone in a group at the same table so families stay together at your reception.',
+  },
+  {
+    question: 'Can I blacklist guests who should not sit together?',
+    answer:
+      'Yes. SeatFinder supports seating blacklists at two levels: "not same table" keeps feuding guests off the same table entirely, and "not next to each other" prevents them from sitting in adjacent seats. Conflicts highlight in red on your floor plan.',
+  },
+  {
+    question: 'How does the auto-arrange seating algorithm work?',
+    answer:
+      'Click Auto-arrange and SeatFinder runs a seating optimizer that searches thousands of table assignments. It respects guest groups, seating blacklists, prefer-together rules, and any seats you have locked. Use Reseat unlocked to reshuffle only guests you have not pinned down.',
+  },
+  {
     question: 'How do I create a wedding seating chart?',
     answer:
-      'Add your tables to the floor plan, enter guest names, then drag each guest onto a seat. Use groups and seating rules for families and conflicts, then click Auto-arrange to seat everyone optimally.',
+      'Add tables to your floor plan, enter guest names, and assign them to groups. Set seating blacklists for guests who must stay apart, lock VIP seats, then click Auto-arrange to generate an optimal seating plan. Fine-tune by dragging guests between seats.',
   },
   {
     question: 'Can I plan seating for events other than weddings?',
@@ -22,11 +37,6 @@ const FAQ = [
     question: 'Does SeatFinder save my seating plan?',
     answer:
       'Your plan saves automatically in your browser. You can also export a PNG with embedded plan data or download JSON to back up and share your seating chart.',
-  },
-  {
-    question: 'What seating rules can I set?',
-    answer:
-      'Mark guests who must sit together, must not sit together, or should sit next to each other. Lock VIP seats (like the couple at the head table) so auto-arrange never moves them.',
   },
 ]
 
@@ -43,8 +53,8 @@ export function SeoFooter() {
           aria-expanded={expanded}
         >
           <span>
-            <strong className="font-medium text-ink">{SITE_NAME}</strong> — free wedding &amp; event
-            seating planner
+            <strong className="font-medium text-ink">{SITE_NAME}</strong> — groups, blacklists
+            &amp; smart seating algorithm
           </span>
           {expanded ? <ChevronUp className="h-3.5 w-3.5 shrink-0" /> : <ChevronDown className="h-3.5 w-3.5 shrink-0" />}
         </button>
@@ -53,25 +63,66 @@ export function SeoFooter() {
           <div className="mt-3 space-y-4 pb-2 text-xs leading-relaxed text-muted">
             <section aria-labelledby="seo-about-heading">
               <h2 id="seo-about-heading" className="mb-1 font-semibold text-ink">
-                Free seating chart planner for weddings and events
+                Free seating chart planner with groups, blacklists &amp; auto-arrange
               </h2>
               <p>
                 {SITE_NAME} helps you build a reception seating chart without spreadsheets or
-                paper cutouts. Drag tables onto your floor plan, assign guests to seats, and use
-                smart auto-arrange to respect families, friend groups, and seating conflicts.
-                Perfect for wedding planners, venues, and couples organizing their big day.
+                paper cutouts. Organize guests into groups and households, set seating blacklists
+                for people who must not share a table or sit next to each other, then let the
+                built-in seating algorithm find a good arrangement automatically. Perfect for
+                wedding planners, venues, and couples who need smart table assignment — not just a
+                drag-and-drop canvas.
+              </p>
+            </section>
+
+            <section aria-labelledby="seo-groups-heading">
+              <h2 id="seo-groups-heading" className="mb-1 font-semibold text-ink">
+                Guest groups &amp; seating blacklists
+              </h2>
+              <ul className="list-inside list-disc space-y-0.5">
+                <li>
+                  <strong className="font-medium text-ink">Groups / households</strong> — keep
+                  families and friend circles at the same table
+                </li>
+                <li>
+                  <strong className="font-medium text-ink">Not same table</strong> — blacklist
+                  pairs who must never share a table (exes, feuding relatives)
+                </li>
+                <li>
+                  <strong className="font-medium text-ink">Not next to each other</strong> —
+                  blacklist guests who must not sit in adjacent seats
+                </li>
+                <li>
+                  <strong className="font-medium text-ink">Prefer together</strong> — nudge couples
+                  and close friends into side-by-side seats
+                </li>
+                <li>
+                  <strong className="font-medium text-ink">Locked seats</strong> — pin the couple
+                  at the head table before the optimizer runs
+                </li>
+              </ul>
+            </section>
+
+            <section aria-labelledby="seo-algorithm-heading">
+              <h2 id="seo-algorithm-heading" className="mb-1 font-semibold text-ink">
+                Smart seating algorithm
+              </h2>
+              <p>
+                SeatFinder&apos;s seating optimizer searches thousands of possible table
+                assignments to score the best layout for your rules. Auto-arrange seats everyone
+                from scratch; Reseat unlocked reshuffles only guests you have not locked. Conflict
+                detection highlights broken blacklists in real time so you can fix problems before
+                export.
               </p>
             </section>
 
             <section aria-labelledby="seo-features-heading">
               <h2 id="seo-features-heading" className="mb-1 font-semibold text-ink">
-                Key features
+                More features
               </h2>
               <ul className="list-inside list-disc space-y-0.5">
                 <li>Drag-and-drop wedding table planner with visual floor plan</li>
                 <li>Round, rectangular, and head tables for any venue layout</li>
-                <li>Guest groups, must-sit-together, and keep-apart rules</li>
-                <li>One-click auto-arrange seating optimizer</li>
                 <li>Export seating chart as PNG or JSON</li>
                 <li>Works in your browser — no account required</li>
               </ul>

@@ -1,7 +1,7 @@
 {
   "name": "SeatFinder — Wedding Seating Planner",
   "short_name": "SeatFinder",
-  "description": "Free drag-and-drop seating chart planner for weddings, banquets, and events.",
+  "description": "Free seating planner with guest groups, seating blacklists, and a smart auto-arrange algorithm for weddings and events.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#faf8f5",
