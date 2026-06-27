@@ -7,6 +7,7 @@ import { useGuestConflictIds, useTableConflictIds } from '../../hooks/useConflic
 import { useIsMobile } from '../../hooks/useMediaQuery'
 import { getTableDimensions } from '../../lib/seating/layout'
 import { CANVAS_DROP_ID } from '../../lib/dnd/types'
+import { cn } from '../../lib/utils'
 import { CanvasToolbar, CanvasGuestDock } from './CanvasToolbar'
 import { TableView } from './TableView'
 
@@ -185,7 +186,7 @@ export function TablesCanvas() {
 
       {linkType && (
         <div
-          className="pointer-events-auto absolute left-2 right-2 top-2 z-30 flex items-center gap-2 rounded-xl border border-rose/40 bg-white/95 px-3 py-2 shadow-lg backdrop-blur md:left-1/2 md:right-auto md:top-3 md:max-w-lg md:-translate-x-1/2 md:gap-3 md:px-4"
+          className="pointer-events-auto absolute left-2 right-2 top-2 z-30 flex items-center gap-2 rounded-lg border border-rose/30 bg-white/35 px-2.5 py-1.5 shadow-md backdrop-blur-md md:left-1/2 md:right-auto md:top-2 md:max-w-lg md:-translate-x-1/2 md:gap-2 md:px-3"
           data-no-pan
         >
           <Wand2 className="h-4 w-4 shrink-0 text-rose-dark" />
@@ -212,7 +213,7 @@ export function TablesCanvas() {
       )}
 
       {!showOnboarding && guests.filter((g) => !g.seat).length === 0 && (
-        <div className="pointer-events-none absolute bottom-[calc(4.5rem+env(safe-area-inset-bottom))] left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-white/75 px-2.5 py-1 text-[10px] text-muted shadow-sm backdrop-blur md:bottom-3">
+        <div className="pointer-events-none absolute bottom-[calc(4.125rem+env(safe-area-inset-bottom))] left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 rounded-full border border-border/25 bg-white/30 px-2 py-0.5 text-[9px] text-muted shadow-sm backdrop-blur-md md:bottom-2">
           <Move className="h-3 w-3" />
           {isMobile ? 'Drag to pan' : 'Drag floor to pan'}
         </div>
@@ -254,7 +255,13 @@ function CanvasWorld({
   )
 }
 
-export function GuestPoolDropZone({ children }: { children: React.ReactNode }) {
+export function GuestPoolDropZone({
+  children,
+  compact = false,
+}: {
+  children: React.ReactNode
+  compact?: boolean
+}) {
   const { setNodeRef, isOver } = useDroppable({
     id: 'guest-pool',
     data: { type: 'pool' },
@@ -264,9 +271,11 @@ export function GuestPoolDropZone({ children }: { children: React.ReactNode }) {
     <div
       ref={setNodeRef}
       data-no-pan
-      className={`min-h-[58px] rounded-xl border-2 border-dashed p-2 shadow-md backdrop-blur-md transition-colors ${
-        isOver ? 'border-rose bg-rose/10' : 'border-border/80 bg-white/95'
-      }`}
+      className={cn(
+        'rounded-lg border border-dashed shadow-sm backdrop-blur-md transition-colors',
+        compact ? 'min-h-[36px] p-1.5' : 'min-h-[48px] p-2',
+        isOver ? 'border-rose bg-rose/10' : 'border-border/30 bg-white/35',
+      )}
     >
       {children}
     </div>

@@ -1,5 +1,4 @@
 import {
-  Download,
   HelpCircle,
   Image,
   Loader2,
@@ -17,7 +16,6 @@ import { useUiStore } from '../store/useUiStore'
 import { useOptimizer } from '../hooks/useOptimizer'
 import { useConflicts } from '../hooks/useConflicts'
 import { useIsMobile } from '../hooks/useMediaQuery'
-import { exportJson } from '../lib/export/exportJson'
 import { exportPlanAsPng } from '../lib/export/exportImage'
 import { importPlanFile } from '../lib/export/importPlan'
 import { cn } from '../lib/utils'
@@ -70,12 +68,6 @@ export function MobileBottomBar({ exportViewRef }: MobileBottomBarProps) {
     setTimeout(() => setStatus(null), 4000)
   }
 
-  const handleExportJson = () => {
-    exportJson(getStoreSnapshot())
-    setStatus('JSON exported')
-    setTimeout(() => setStatus(null), 2000)
-  }
-
   const handleExportPng = async () => {
     if (!exportViewRef.current) return
     try {
@@ -106,7 +98,7 @@ export function MobileBottomBar({ exportViewRef }: MobileBottomBarProps) {
       )}
 
       <nav
-        className="fixed inset-x-0 bottom-0 z-[70] border-t border-border bg-white/95 backdrop-blur-md md:hidden"
+        className="fixed inset-x-0 bottom-0 z-[70] border-t border-border/50 bg-white/60 backdrop-blur-md md:hidden"
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
       >
         <div className="grid grid-cols-4 gap-1 px-2 py-1.5">
@@ -163,7 +155,6 @@ export function MobileBottomBar({ exportViewRef }: MobileBottomBarProps) {
       >
         <div className="space-y-2">
           <ActionRow icon={RefreshCw} label="Reseat unlocked" disabled={isRunning} onClick={handleReseatUnlocked} />
-          <ActionRow icon={Download} label="Export JSON" onClick={handleExportJson} />
           <ActionRow icon={Image} label="Export PNG" onClick={handleExportPng} />
           <ActionRow icon={Upload} label="Import plan" onClick={() => fileInputRef.current?.click()} />
           <ActionRow icon={HelpCircle} label="How it works" onClick={() => { setMobileSheet(null); setGuideOpen(true) }} />
@@ -245,7 +236,7 @@ function ActionRow({
   disabled,
   destructive,
 }: {
-  icon: typeof Download
+  icon: typeof RefreshCw
   label: string
   onClick: () => void
   disabled?: boolean

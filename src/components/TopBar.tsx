@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react'
 import {
-  Download,
   HelpCircle,
   Image,
   Loader2,
@@ -14,7 +13,6 @@ import { useUiStore } from '../store/useUiStore'
 import { useOptimizer } from '../hooks/useOptimizer'
 import { useConflicts } from '../hooks/useConflicts'
 import { useIsMobile } from '../hooks/useMediaQuery'
-import { exportJson } from '../lib/export/exportJson'
 import { exportPlanAsPng } from '../lib/export/exportImage'
 import { importPlanFile } from '../lib/export/importPlan'
 
@@ -47,12 +45,6 @@ export function TopBar({ exportViewRef }: TopBarProps) {
     }
     e.target.value = ''
     setTimeout(() => setStatus(null), 4000)
-  }
-
-  const handleExportJson = () => {
-    exportJson(getStoreSnapshot())
-    setStatus('JSON exported')
-    setTimeout(() => setStatus(null), 2000)
   }
 
   const handleExportPng = async () => {
@@ -89,18 +81,18 @@ export function TopBar({ exportViewRef }: TopBarProps) {
   if (isMobile) {
     return (
       <header
-        className="flex shrink-0 items-center gap-2 border-b border-border bg-white px-3 py-2 shadow-sm"
-        style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top))' }}
+        className="flex shrink-0 items-center gap-2 border-b border-border bg-white px-3 py-1.5 shadow-sm"
+        style={{ paddingTop: 'max(0.375rem, env(safe-area-inset-top))' }}
       >
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-rose to-rose-dark text-white">
-          <Sparkles className="h-3.5 w-3.5" />
+        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-rose to-rose-dark text-white">
+          <Sparkles className="h-3 w-3" />
         </div>
         <div className="min-w-0 flex-1">
           <input
             type="text"
             value={projectName}
             onChange={(e) => setProjectName(e.target.value)}
-            className="w-full truncate bg-transparent font-serif text-base font-semibold text-ink outline-none"
+            className="w-full truncate bg-transparent font-serif text-sm font-semibold text-ink outline-none"
             style={{ fontFamily: 'Playfair Display, serif' }}
           />
         </div>
@@ -117,7 +109,7 @@ export function TopBar({ exportViewRef }: TopBarProps) {
         <button
           type="button"
           onClick={() => setGuideOpen(true)}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border text-muted hover:bg-cream"
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-border text-muted hover:bg-cream"
           title="How it works"
         >
           <HelpCircle className="h-4 w-4" />
@@ -127,13 +119,13 @@ export function TopBar({ exportViewRef }: TopBarProps) {
   }
 
   return (
-    <header className="flex items-center gap-4 border-b border-border bg-white px-6 py-3 shadow-sm">
-      <div className="flex items-center gap-3">
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-rose to-rose-dark text-white">
-          <Sparkles className="h-4 w-4" />
+    <header className="flex items-center gap-3 border-b border-border bg-white px-4 py-1.5 shadow-sm">
+      <div className="flex items-center gap-2">
+        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-rose to-rose-dark text-white">
+          <Sparkles className="h-3.5 w-3.5" />
         </div>
         <div>
-          <h1 className="text-[10px] uppercase tracking-wider text-muted">
+          <h1 className="text-[9px] uppercase tracking-wider text-muted">
             <span className="sr-only">Free wedding &amp; event seating chart planner — </span>
             SeatFinder
           </h1>
@@ -141,33 +133,33 @@ export function TopBar({ exportViewRef }: TopBarProps) {
             type="text"
             value={projectName}
             onChange={(e) => setProjectName(e.target.value)}
-            className="bg-transparent font-serif text-lg font-semibold text-ink outline-none"
+            className="bg-transparent font-serif text-base font-semibold text-ink outline-none"
             style={{ fontFamily: 'Playfair Display, serif' }}
           />
         </div>
       </div>
 
-      <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+      <div className="ml-auto flex flex-wrap items-center justify-end gap-1.5">
         {conflicts.length > 0 && (
-          <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700">
+          <span className="rounded-full bg-red-100 px-2 py-0.5 text-[11px] font-medium text-red-700">
             {conflicts.length} conflict{conflicts.length !== 1 ? 's' : ''}
           </span>
         )}
 
         {status && (
-          <span className="rounded-full bg-sage/20 px-3 py-1 text-xs text-sage">{status}</span>
+          <span className="rounded-full bg-sage/20 px-2 py-0.5 text-[11px] text-sage">{status}</span>
         )}
 
         <button
           type="button"
           onClick={handleAutoArrange}
           disabled={isRunning}
-          className="flex items-center gap-1.5 rounded-lg bg-gradient-to-r from-rose to-rose-dark px-4 py-2 text-sm font-medium text-white shadow-sm transition hover:shadow-md disabled:opacity-60"
+          className="flex items-center gap-1 rounded-lg bg-gradient-to-r from-rose to-rose-dark px-3 py-1.5 text-xs font-medium text-white shadow-sm transition hover:shadow-md disabled:opacity-60"
         >
           {isRunning ? (
-            <Loader2 className="h-4 w-4 animate-spin" />
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
           ) : (
-            <Sparkles className="h-4 w-4" />
+            <Sparkles className="h-3.5 w-3.5" />
           )}
           Auto-arrange
         </button>
@@ -176,40 +168,30 @@ export function TopBar({ exportViewRef }: TopBarProps) {
           type="button"
           onClick={handleReseatUnlocked}
           disabled={isRunning}
-          className="flex items-center gap-1.5 rounded-lg border border-border bg-white px-3 py-2 text-sm font-medium text-ink transition hover:bg-cream disabled:opacity-60"
+          className="flex items-center gap-1 rounded-lg border border-border bg-white px-2.5 py-1.5 text-xs font-medium text-ink transition hover:bg-cream disabled:opacity-60"
         >
-          <RefreshCw className="h-4 w-4" />
+          <RefreshCw className="h-3.5 w-3.5" />
           Reseat unlocked
         </button>
 
-        <div className="mx-1 hidden h-6 w-px bg-border sm:block" />
-
-        <button
-          type="button"
-          onClick={handleExportJson}
-          className="flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-sm hover:bg-cream"
-          title="Export JSON"
-        >
-          <Download className="h-4 w-4" />
-          JSON
-        </button>
+        <div className="mx-0.5 hidden h-5 w-px bg-border sm:block" />
 
         <button
           type="button"
           onClick={handleExportPng}
-          className="flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-sm hover:bg-cream"
+          className="flex items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 text-xs hover:bg-cream"
           title="Export PNG with embedded plan"
         >
-          <Image className="h-4 w-4" />
+          <Image className="h-3.5 w-3.5" />
           PNG
         </button>
 
         <button
           type="button"
           onClick={() => fileInputRef.current?.click()}
-          className="flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-sm hover:bg-cream"
+          className="flex items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 text-xs hover:bg-cream"
         >
-          <Upload className="h-4 w-4" />
+          <Upload className="h-3.5 w-3.5" />
           Import
         </button>
 
@@ -223,20 +205,20 @@ export function TopBar({ exportViewRef }: TopBarProps) {
                 setTimeout(() => setStatus(null), 2000)
               }
             }}
-            className="hidden items-center gap-1 rounded-lg border border-border px-3 py-2 text-sm text-muted hover:bg-cream lg:flex"
+            className="hidden items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 text-xs text-muted hover:bg-cream lg:flex"
             title="Clear all and start fresh"
           >
-            <Trash2 className="h-4 w-4" />
+            <Trash2 className="h-3.5 w-3.5" />
           </button>
         )}
 
         <button
           type="button"
           onClick={() => setGuideOpen(true)}
-          className="flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-sm hover:bg-cream"
+          className="flex items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 text-xs hover:bg-cream"
           title="How it works"
         >
-          <HelpCircle className="h-4 w-4" />
+          <HelpCircle className="h-3.5 w-3.5" />
         </button>
 
         <input

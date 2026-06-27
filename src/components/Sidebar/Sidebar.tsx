@@ -32,7 +32,7 @@ function SidebarTabs({
           key={id}
           type="button"
           onClick={() => onTabChange(id)}
-          className={`shrink-0 rounded-lg px-3 py-2 text-xs font-medium transition ${
+          className={`shrink-0 rounded-lg px-2 py-1 text-[11px] font-medium transition ${
             activeTab === id
               ? 'bg-rose/15 text-rose-dark'
               : 'text-muted hover:bg-cream'
@@ -80,11 +80,11 @@ export function Sidebar() {
 
   if (collapsed) {
     return (
-      <aside className="hidden w-12 shrink-0 flex-col items-center border-r border-border bg-white py-3 md:flex">
+      <aside className="hidden w-10 shrink-0 flex-col items-center border-r border-border bg-white py-2 md:flex">
         <button
           type="button"
           onClick={() => setCollapsed(false)}
-          className="flex flex-col items-center gap-2 rounded-lg p-2 text-muted hover:bg-cream hover:text-ink"
+          className="flex flex-col items-center gap-1 rounded-lg p-1.5 text-muted hover:bg-cream hover:text-ink"
           title="Open options"
         >
           <SlidersHorizontal className="h-4 w-4" />
@@ -98,9 +98,9 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="hidden w-80 shrink-0 flex-col border-r border-border bg-white md:flex">
-      <div className="flex items-center justify-between border-b border-border px-4 py-3">
-        <h2 className="font-serif text-lg font-semibold text-ink">Plan</h2>
+    <aside className="hidden w-56 shrink-0 flex-col border-r border-border bg-white md:flex">
+      <div className="flex items-center justify-between border-b border-border px-3 py-1.5">
+        <h2 className="font-serif text-sm font-semibold text-ink">Plan</h2>
         <button
           type="button"
           onClick={() => setCollapsed(true)}
@@ -111,11 +111,11 @@ export function Sidebar() {
         </button>
       </div>
 
-      <div className="border-b border-border px-2 py-2">
+      <div className="border-b border-border px-1.5 py-1">
         <SidebarTabs activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
 
-      <div className="flex-1 overflow-y-auto p-4 scrollbar-thin">
+      <div className="flex-1 overflow-y-auto p-2.5 scrollbar-thin">
         <SidebarPanel activeTab={activeTab} />
       </div>
     </aside>

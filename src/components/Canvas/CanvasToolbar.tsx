@@ -154,75 +154,75 @@ export function CanvasToolbar() {
   if (isMobile) return null
 
   return (
-    <div className="pointer-events-auto absolute left-3 top-3 z-20 flex max-w-[min(24rem,calc(100%-1.5rem))] flex-col gap-2">
-      <div className="rounded-xl border border-border/80 bg-white/95 p-2 shadow-md backdrop-blur-md">
-        <p className="mb-1.5 text-[9px] font-semibold uppercase tracking-wider text-muted">
+    <div className="pointer-events-auto absolute left-2 top-2 z-20 flex w-[9rem] flex-col gap-1.5">
+      <div className="rounded-lg border border-border/30 bg-white/35 p-2 shadow-sm backdrop-blur-md">
+        <p className="mb-1.5 text-[8px] font-semibold uppercase tracking-wider text-muted">
           Quick add
         </p>
-        <div className="flex gap-1.5">
+        <div className="flex flex-col gap-1">
           <input
             type="text"
             value={guestName}
             onChange={(e) => setGuestName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleAddGuest()}
-            placeholder="Guest name..."
-            className="min-w-0 flex-1 rounded-lg border border-border bg-cream/40 px-2.5 py-1.5 text-xs outline-none focus:border-rose focus:ring-2 focus:ring-rose/20"
+            placeholder="Name..."
+            className="w-full rounded-md border border-border/60 bg-cream/30 px-2 py-1.5 text-[11px] outline-none focus:border-rose focus:ring-1 focus:ring-rose/20"
           />
           <button
             type="button"
             onClick={handleAddGuest}
-            className="flex shrink-0 items-center gap-1 rounded-lg bg-gradient-to-r from-rose to-rose-dark px-2.5 py-1.5 text-xs font-medium text-white shadow-sm hover:shadow-md"
+            className="flex w-full items-center justify-center gap-1 rounded-md bg-gradient-to-r from-rose to-rose-dark px-2 py-1.5 text-[11px] font-medium text-white shadow-sm"
           >
-            <UserPlus className="h-3.5 w-3.5" />
+            <UserPlus className="h-3 w-3" />
             Add
           </button>
         </div>
         {hasGuests && (
-          <p className="mt-1.5 text-[10px] text-muted">
-            {waitingCount} waiting · drag guests from the dock below
+          <p className="mt-1.5 text-[9px] leading-snug text-muted">
+            {waitingCount} waiting
           </p>
         )}
       </div>
 
-      <div className="rounded-xl border border-border/80 bg-white/95 p-2 shadow-md backdrop-blur-md">
-        <p className="mb-1.5 text-[9px] font-semibold uppercase tracking-wider text-muted">
-          Drag tables onto floor
+      <div className="rounded-lg border border-border/30 bg-white/35 p-2 shadow-sm backdrop-blur-md">
+        <p className="mb-1.5 text-[8px] font-semibold uppercase tracking-wider text-muted">
+          Tables
         </p>
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-col gap-1">
           {TABLE_TEMPLATES.map(({ shape, label, capacity, icon: Icon }) => (
-            <TableTemplateChip key={shape} shape={shape} label={label} capacity={capacity} icon={Icon} />
+            <TableTemplateChip key={shape} shape={shape} label={label} capacity={capacity} icon={Icon} stacked />
           ))}
         </div>
       </div>
 
-      <div className="rounded-xl border border-border/80 bg-white/95 p-2 shadow-md backdrop-blur-md">
+      <div className="rounded-lg border border-border/30 bg-white/35 p-2 shadow-sm backdrop-blur-md">
         <div className="mb-1.5 flex items-center gap-1">
-          <Wand2 className="h-3 w-3 text-rose-dark" />
-          <p className="text-[9px] font-semibold uppercase tracking-wider text-muted">
-            Seating rules
+          <Wand2 className="h-2.5 w-2.5 text-rose-dark" />
+          <p className="text-[8px] font-semibold uppercase tracking-wider text-muted">
+            Rules
           </p>
         </div>
-        <div className="flex flex-wrap gap-1">
+        <div className="flex flex-col gap-0.5">
           {RULE_OPTIONS.map(({ type, icon: Icon }) => (
             <button
               key={type}
               type="button"
               onClick={() => beginRuleFromToolbar(type)}
               className={cn(
-                'flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-left text-[11px] transition',
+                'flex w-full items-center gap-1 rounded-md px-2 py-1.5 text-left text-[10px] transition',
                 linkType === type
                   ? 'bg-rose/15 text-rose-dark ring-1 ring-rose/40'
-                  : 'text-ink hover:bg-cream',
+                  : 'text-ink hover:bg-cream/60',
               )}
             >
-              <Icon className="h-3 w-3 shrink-0 text-muted" />
-              {RULE_META[type].label}
+              <Icon className="h-2.5 w-2.5 shrink-0 text-muted" />
+              <span className="truncate">{RULE_META[type].label}</span>
             </button>
           ))}
         </div>
         {linkType && (
-          <p className="mt-1.5 rounded-lg bg-cream/80 px-2 py-1 text-[10px] text-muted">
-            Click two guests on the map to create this rule
+          <p className="mt-1.5 rounded-md bg-cream/40 px-1.5 py-1 text-[9px] leading-snug text-muted">
+            Click two guests on the map
           </p>
         )}
       </div>
@@ -236,12 +236,14 @@ function TableTemplateChip({
   capacity,
   icon: Icon,
   large,
+  stacked,
 }: {
   shape: TableShape
   label: string
   capacity: number
   icon: typeof Circle
   large?: boolean
+  stacked?: boolean
 }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: tableTemplateDragId(shape, capacity),
@@ -258,7 +260,9 @@ function TableTemplateChip({
       {...attributes}
       className={cn(
         'flex cursor-grab items-center gap-1 rounded-lg border border-border bg-cream/50 font-medium text-ink shadow-sm transition hover:border-rose/50 hover:bg-white active:cursor-grabbing',
-        large ? 'min-h-[44px] px-3 py-2 text-sm' : 'px-2 py-1.5 text-[11px]',
+        stacked && 'w-full justify-between px-2 py-1.5 text-[10px]',
+        large && !stacked && 'min-h-[44px] px-3 py-2 text-sm',
+        !large && !stacked && 'px-2 py-1.5 text-[11px]',
         isDragging && 'z-50 opacity-60 shadow-lg',
       )}
     >
@@ -311,30 +315,33 @@ export function CanvasGuestDock() {
   return (
     <div
       className={cn(
-        'pointer-events-auto absolute left-3 right-3 z-20 mx-auto max-w-2xl',
-        isMobile ? 'bottom-[calc(4.5rem+env(safe-area-inset-bottom))]' : 'bottom-3',
+        'pointer-events-auto absolute left-2 right-2 z-20 mx-auto max-w-lg',
+        isMobile ? 'bottom-[calc(4.125rem+env(safe-area-inset-bottom))]' : 'bottom-2',
       )}
     >
-      <GuestPoolDropZone>
-        <div className="mb-1 flex items-center justify-between gap-2">
-          <p className="text-[11px] font-semibold text-ink">Guest dock</p>
-          <p className="truncate text-[10px] text-muted">
-            {unassigned.length} unassigned — drag onto seats
+      <GuestPoolDropZone compact>
+        <div className="mb-0.5 flex items-center justify-between gap-2">
+          <p className="text-[10px] font-semibold text-ink">Guests</p>
+          <p className="truncate text-[9px] text-muted">
+            {unassigned.length} unassigned
           </p>
         </div>
         {unassigned.length === 0 ? (
-          <p className="py-1.5 text-center text-xs text-muted">
-            Everyone is seated — drop a guest here to unassign
+          <p className="py-1 text-center text-[10px] text-muted">
+            All seated — drop here to unassign
           </p>
         ) : (
           <div className={cn(
-            'flex flex-wrap gap-1.5 overflow-y-auto pr-1 scrollbar-thin',
-            isMobile ? 'max-h-24' : 'max-h-28',
+            'flex flex-wrap gap-1 overflow-y-auto pr-0.5 scrollbar-thin',
+            isMobile ? 'max-h-16' : 'max-h-20',
           )}>
             {unassigned.map((guest) => (
               <div
                 key={guest.id}
-                className={`group relative ${menuGuestId === guest.id && !linkType ? 'z-50' : ''}`}
+                className={cn(
+                  'group relative pt-1.5 pr-0.5',
+                  menuGuestId === guest.id && !linkType && 'z-50',
+                )}
               >
                 <GuestChip
                   guest={guest}
@@ -345,6 +352,7 @@ export function CanvasGuestDock() {
                   pickable={!!linkType && guest.id !== linkSourceId}
                   selected={guest.id === linkSourceId}
                   touchFriendly={isMobile}
+                  compact
                 />
                 {menuGuestId === guest.id && !linkType && (
                   <GuestSeatMenu guest={guest} placement="top" />
@@ -353,12 +361,12 @@ export function CanvasGuestDock() {
                   type="button"
                   onClick={() => removeGuest(guest.id)}
                   className={cn(
-                    'absolute -right-1 -top-1 rounded-full bg-red-500 p-1 text-white',
+                    'absolute right-0 top-0 z-10 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-red-500 text-white shadow-sm ring-1 ring-white',
                     isMobile ? 'flex' : 'hidden group-hover:flex',
                   )}
                   title="Remove guest"
                 >
-                  <Minus className="h-2.5 w-2.5" />
+                  <Minus className="h-2 w-2" strokeWidth={3} />
                 </button>
               </div>
             ))}

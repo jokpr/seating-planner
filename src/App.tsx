@@ -16,7 +16,6 @@ import { TablesCanvas } from './components/Canvas/TablesCanvas'
 import { ExportView } from './components/ExportView'
 import { GuestChip } from './components/GuestChip'
 import { GuideModal } from './components/GuideModal'
-import { SeoFooter } from './components/SeoFooter'
 import { Toast } from './components/Toast'
 import { MobileBottomBar } from './components/MobileBottomBar'
 import { useSeatingStore } from './store/useSeatingStore'
@@ -150,13 +149,12 @@ function App() {
         <div className="flex flex-1 overflow-hidden pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0">
           <Sidebar />
           <main
-            className="flex flex-1 flex-col overflow-hidden p-1.5 md:p-3"
+            className="flex flex-1 flex-col overflow-hidden p-1 md:p-1.5"
             aria-label="Seating chart floor plan"
           >
             <TablesCanvas />
           </main>
         </div>
-        <SeoFooter />
       </div>
 
       <MobileBottomBar exportViewRef={exportViewRef} />
@@ -172,11 +170,11 @@ function App() {
             group={activeGuest.groupId ? groupMap.get(activeGuest.groupId) : undefined}
           />
         ) : activeTable ? (
-          <div className="rounded-xl border border-rose/40 bg-white/95 px-4 py-2 text-sm font-semibold shadow-lg">
+          <div className="rounded-xl border border-rose/30 bg-white/35 px-3 py-1.5 text-sm font-semibold shadow-md backdrop-blur-md">
             {activeTable.name}
           </div>
         ) : activeTemplate ? (
-          <div className="flex items-center gap-2 rounded-xl border border-rose/40 bg-white/95 px-4 py-2 text-sm font-medium shadow-lg">
+          <div className="flex items-center gap-2 rounded-xl border border-rose/30 bg-white/35 px-3 py-1.5 text-sm font-medium shadow-md backdrop-blur-md">
             <TemplateIcon shape={activeTemplate.shape} />
             New {activeTemplate.shape} table ({activeTemplate.capacity})
           </div>

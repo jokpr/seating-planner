@@ -37,14 +37,20 @@ export function GuestChip({
     disabled: guest.locked,
   })
 
-  const style = transform
-    ? { transform: CSS.Translate.toString(transform) }
-    : undefined
+  const groupShadow =
+    group?.color && !hasConflict && !selected && !pickable
+      ? { boxShadow: `0 1px 3px ${group.color}22, 0 1px 2px rgba(0,0,0,0.04)` }
+      : undefined
+
+  const style = {
+    ...groupShadow,
+    ...(transform ? { transform: CSS.Translate.toString(transform) } : {}),
+  }
 
   return (
     <div
       ref={setNodeRef}
-      style={style}
+      style={Object.keys(style).length > 0 ? style : undefined}
       data-no-pan
       {...listeners}
       {...attributes}
@@ -57,8 +63,8 @@ export function GuestChip({
           : undefined
       }
       className={cn(
-        'group relative flex items-center gap-1.5 rounded-full border bg-white shadow-sm transition-all',
-        compact ? 'px-2 py-1.5 text-xs min-h-[36px]' : 'px-3 py-2 text-sm min-h-[40px]',
+        'group relative flex items-center gap-1.5 rounded-full border bg-gradient-to-br from-white/80 via-white/70 to-cream/40 shadow-sm backdrop-blur-sm transition-all',
+        compact ? 'px-2 py-1 text-[11px] min-h-[30px]' : 'px-3 py-1.5 text-sm min-h-[36px]',
         guest.locked
           ? 'cursor-pointer opacity-95'
           : onClick
@@ -67,18 +73,21 @@ export function GuestChip({
         hasConflict
           ? 'border-red-400 ring-2 ring-red-200'
           : selected
-            ? 'border-rose ring-2 ring-rose/40'
+            ? 'border-rose ring-2 ring-rose/40 shadow-md shadow-rose/10'
             : pickable
               ? 'border-sage ring-2 ring-sage/40 animate-pulse'
-              : 'border-border hover:shadow-md hover:border-rose/40',
+              : 'border-border/70 hover:border-rose/50 hover:shadow-md hover:shadow-rose/5',
         isDragging && 'z-50 opacity-50 shadow-lg',
       )}
     >
       <span
-        className="h-2 w-2 shrink-0 rounded-full"
+        className={cn(
+          'shrink-0 rounded-full ring-2 ring-white shadow-sm',
+          compact ? 'h-3 w-3' : 'h-4 w-4',
+        )}
         style={{ backgroundColor: group?.color ?? '#d1d5db' }}
       />
-      <span className={cn('truncate font-medium text-ink', compact ? 'max-w-[72px]' : 'max-w-[120px]')}>
+      <span className={cn('truncate font-medium tracking-tight text-ink', compact ? 'max-w-[64px]' : 'max-w-[100px]')}>
         {guest.name}
       </span>
       {onToggleLock ? (
