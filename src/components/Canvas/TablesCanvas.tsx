@@ -4,6 +4,7 @@ import { Sparkles, Wand2, X, Move } from 'lucide-react'
 import { useSeatingStore } from '../../store/useSeatingStore'
 import { useUiStore, RULE_META } from '../../store/useUiStore'
 import { useGuestConflictIds, useTableConflictIds } from '../../hooks/useConflicts'
+import { useIsMobile } from '../../hooks/useMediaQuery'
 import { getTableDimensions } from '../../lib/seating/layout'
 import { CANVAS_DROP_ID } from '../../lib/dnd/types'
 import { CanvasToolbar, CanvasGuestDock } from './CanvasToolbar'
@@ -25,6 +26,8 @@ export function TablesCanvas() {
   const canvasPan = useUiStore((s) => s.canvasPan)
   const setSelectedTableId = useUiStore((s) => s.setSelectedTableId)
   const setSidebarCollapsed = useUiStore((s) => s.setSidebarCollapsed)
+  const setMobileSheet = useUiStore((s) => s.setMobileSheet)
+  const isMobile = useIsMobile()
 
   const viewportRef = useRef<HTMLDivElement>(null)
   const suppressBackgroundClick = useRef(false)
@@ -63,6 +66,7 @@ export function TablesCanvas() {
       if (target.closest('button, input, select, textarea, [role="button"]')) return
 
       setSidebarCollapsed(true)
+      if (isMobile) setMobileSheet(null)
       e.currentTarget.setPointerCapture(e.pointerId)
       panState.current = {
         active: true,
@@ -73,7 +77,7 @@ export function TablesCanvas() {
         panY: canvasPan.y,
       }
     },
-    [canvasPan.x, canvasPan.y, setSidebarCollapsed],
+    [canvasPan.x, canvasPan.y, setSidebarCollapsed, isMobile, setMobileSheet],
   )
 
   const handlePanPointerMove = useCallback((e: React.PointerEvent) => {
@@ -110,7 +114,7 @@ export function TablesCanvas() {
   }, [setSelectedTableId])
 
   return (
-    <div className="canvas-floor relative h-full min-h-[560px] flex-1 overflow-hidden rounded-2xl border border-border shadow-inner">
+    <div className="canvas-floor relative h-full min-h-[280px] flex-1 overflow-hidden rounded-xl border border-border shadow-inner md:min-h-[560px] md:rounded-2xl">
       <div
         ref={viewportRef}
         className="canvas-viewport h-full w-full overflow-hidden"
@@ -121,18 +125,20 @@ export function TablesCanvas() {
       >
         <CanvasWorld bounds={bounds} pan={canvasPan} onBackgroundClick={handleBackgroundClick}>
           {showOnboarding ? (
-            <div className="flex h-full min-h-[560px] items-center justify-center">
+            <div className="flex h-full min-h-[280px] items-center justify-center px-4 md:min-h-[560px]">
               <div
-                className="max-w-md rounded-2xl border border-border bg-white/90 p-8 text-center shadow-lg backdrop-blur-sm"
+                className="max-w-md rounded-2xl border border-border bg-white/90 p-5 text-center shadow-lg backdrop-blur-sm md:p-8"
                 data-no-pan
               >
                 <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-rose to-rose-dark text-white">
                   <Sparkles className="h-6 w-6" />
                 </div>
-                <h2 className="font-serif text-2xl font-semibold text-ink">Let's seat your guests</h2>
+                <h2 className="font-serif text-xl font-semibold text-ink md:text-2xl">
+                  Plan your wedding seating chart
+                </h2>
                 <p className="mt-2 text-sm text-muted">
-                  Drag tables from the toolbar onto the floor, add guests, then drop them on seats.
-                  Auto-arrange can do the rest.
+                  Free drag-and-drop seating planner for weddings, receptions, and events. Drag
+                  tables onto the floor, add guests, set seating rules, then auto-arrange the rest.
                 </p>
                 <div className="mt-5 flex flex-wrap justify-center gap-2">
                   <button
@@ -179,26 +185,26 @@ export function TablesCanvas() {
 
       {linkType && (
         <div
-          className="pointer-events-auto absolute left-1/2 top-3 z-30 flex -translate-x-1/2 items-center gap-3 rounded-xl border border-rose/40 bg-white/95 px-4 py-2 shadow-lg backdrop-blur"
+          className="pointer-events-auto absolute left-2 right-2 top-2 z-30 flex items-center gap-2 rounded-xl border border-rose/40 bg-white/95 px-3 py-2 shadow-lg backdrop-blur md:left-1/2 md:right-auto md:top-3 md:max-w-lg md:-translate-x-1/2 md:gap-3 md:px-4"
           data-no-pan
         >
-          <Wand2 className="h-4 w-4 text-rose-dark" />
-          <span className="text-sm text-ink">
+          <Wand2 className="h-4 w-4 shrink-0 text-rose-dark" />
+          <span className="min-w-0 flex-1 text-xs text-ink md:text-sm">
             {linkSourceName ? (
               <>
                 Creating rule — <strong>{linkSourceName}</strong> {RULE_META[linkType].verb}…{' '}
-                <span className="text-muted">click another guest</span>
+                <span className="text-muted">tap another guest</span>
               </>
             ) : (
               <>
-                Creating rule — <span className="text-muted">click two guests on the map</span>
+                Creating rule — <span className="text-muted">tap two guests on the map</span>
               </>
             )}
           </span>
           <button
             type="button"
             onClick={cancelLink}
-            className="ml-auto flex items-center gap-1 rounded-lg border border-border px-2 py-1 text-xs text-muted hover:bg-cream"
+            className="flex shrink-0 items-center gap-1 rounded-lg border border-border px-2 py-1 text-xs text-muted hover:bg-cream"
           >
             <X className="h-3 w-3" /> Cancel
           </button>
@@ -206,9 +212,9 @@ export function TablesCanvas() {
       )}
 
       {!showOnboarding && guests.filter((g) => !g.seat).length === 0 && (
-        <div className="pointer-events-none absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-white/75 px-2.5 py-1 text-[10px] text-muted shadow-sm backdrop-blur">
+        <div className="pointer-events-none absolute bottom-[calc(4.5rem+env(safe-area-inset-bottom))] left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-white/75 px-2.5 py-1 text-[10px] text-muted shadow-sm backdrop-blur md:bottom-3">
           <Move className="h-3 w-3" />
-          Drag floor to pan
+          {isMobile ? 'Drag to pan' : 'Drag floor to pan'}
         </div>
       )}
     </div>

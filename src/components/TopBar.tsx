@@ -13,6 +13,7 @@ import { useSeatingStore, getStoreSnapshot } from '../store/useSeatingStore'
 import { useUiStore } from '../store/useUiStore'
 import { useOptimizer } from '../hooks/useOptimizer'
 import { useConflicts } from '../hooks/useConflicts'
+import { useIsMobile } from '../hooks/useMediaQuery'
 import { exportJson } from '../lib/export/exportJson'
 import { exportPlanAsPng } from '../lib/export/exportImage'
 import { importPlanFile } from '../lib/export/importPlan'
@@ -22,6 +23,7 @@ interface TopBarProps {
 }
 
 export function TopBar({ exportViewRef }: TopBarProps) {
+  const isMobile = useIsMobile()
   const projectName = useSeatingStore((s) => s.projectName)
   const setProjectName = useSeatingStore((s) => s.setProjectName)
   const importState = useSeatingStore((s) => s.importState)
@@ -84,6 +86,46 @@ export function TopBar({ exportViewRef }: TopBarProps) {
     setTimeout(() => setStatus(null), 4000)
   }
 
+  if (isMobile) {
+    return (
+      <header
+        className="flex shrink-0 items-center gap-2 border-b border-border bg-white px-3 py-2 shadow-sm"
+        style={{ paddingTop: 'max(0.5rem, env(safe-area-inset-top))' }}
+      >
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-rose to-rose-dark text-white">
+          <Sparkles className="h-3.5 w-3.5" />
+        </div>
+        <div className="min-w-0 flex-1">
+          <input
+            type="text"
+            value={projectName}
+            onChange={(e) => setProjectName(e.target.value)}
+            className="w-full truncate bg-transparent font-serif text-base font-semibold text-ink outline-none"
+            style={{ fontFamily: 'Playfair Display, serif' }}
+          />
+        </div>
+        {conflicts.length > 0 && (
+          <span className="shrink-0 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-medium text-red-700">
+            {conflicts.length}
+          </span>
+        )}
+        {status && (
+          <span className="hidden max-w-[40%] truncate rounded-full bg-sage/20 px-2 py-0.5 text-[10px] text-sage sm:inline">
+            {status}
+          </span>
+        )}
+        <button
+          type="button"
+          onClick={() => setGuideOpen(true)}
+          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border text-muted hover:bg-cream"
+          title="How it works"
+        >
+          <HelpCircle className="h-4 w-4" />
+        </button>
+      </header>
+    )
+  }
+
   return (
     <header className="flex items-center gap-4 border-b border-border bg-white px-6 py-3 shadow-sm">
       <div className="flex items-center gap-3">
@@ -91,7 +133,10 @@ export function TopBar({ exportViewRef }: TopBarProps) {
           <Sparkles className="h-4 w-4" />
         </div>
         <div>
-          <p className="text-[10px] uppercase tracking-wider text-muted">SeatFinder</p>
+          <h1 className="text-[10px] uppercase tracking-wider text-muted">
+            <span className="sr-only">Free wedding &amp; event seating chart planner — </span>
+            SeatFinder
+          </h1>
           <input
             type="text"
             value={projectName}

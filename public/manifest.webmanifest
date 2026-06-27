@@ -1,0 +1,26 @@
+{
+  "name": "SeatFinder — Wedding Seating Planner",
+  "short_name": "SeatFinder",
+  "description": "Free drag-and-drop seating chart planner for weddings, banquets, and events.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#faf8f5",
+  "theme_color": "#e8a0bf",
+  "orientation": "any",
+  "categories": ["lifestyle", "productivity", "utilities"],
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.svg",
+      "sizes": "180x180",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

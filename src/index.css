@@ -26,6 +26,9 @@
     background: var(--color-cream);
     color: var(--color-ink);
     -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    overscroll-behavior: none;
+    touch-action: manipulation;
   }
 
   * {
@@ -34,6 +37,18 @@
 }
 
 @layer utilities {
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
   .scrollbar-thin {
     scrollbar-width: thin;
     scrollbar-color: #d1d5db transparent;
@@ -56,5 +71,13 @@
 
   .canvas-viewport:active {
     cursor: grabbing;
+  }
+
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
   }
 }

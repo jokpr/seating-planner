@@ -3,6 +3,7 @@ import {
   DndContext,
   DragOverlay,
   PointerSensor,
+  TouchSensor,
   useSensor,
   useSensors,
   type DragEndEvent,
@@ -15,7 +16,9 @@ import { TablesCanvas } from './components/Canvas/TablesCanvas'
 import { ExportView } from './components/ExportView'
 import { GuestChip } from './components/GuestChip'
 import { GuideModal } from './components/GuideModal'
+import { SeoFooter } from './components/SeoFooter'
 import { Toast } from './components/Toast'
+import { MobileBottomBar } from './components/MobileBottomBar'
 import { useSeatingStore } from './store/useSeatingStore'
 import { useUiStore } from './store/useUiStore'
 import {
@@ -51,6 +54,7 @@ function App() {
   const cancelLink = useUiStore((s) => s.cancelLink)
   const linkType = useUiStore((s) => s.linkType)
   const setSidebarCollapsed = useUiStore((s) => s.setSidebarCollapsed)
+  const setMobileSheet = useUiStore((s) => s.setMobileSheet)
   const exportViewRef = useRef<HTMLDivElement>(null)
 
   const [activeGuestId, setActiveGuestId] = useState<string | null>(null)
@@ -69,12 +73,14 @@ function App() {
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 8 } }),
   )
 
   const groupMap = new Map(groups.map((g) => [g.id, g]))
 
   const handleDragStart = (event: DragStartEvent) => {
     setSidebarCollapsed(true)
+    setMobileSheet(null)
     if (linkType) cancelLink()
     const guestId = parseGuestDragId(String(event.active.id))
     if (guestId) {
@@ -141,13 +147,19 @@ function App() {
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       <div className="flex h-full flex-col">
         <TopBar exportViewRef={exportViewRef} />
-        <div className="flex flex-1 overflow-hidden">
+        <div className="flex flex-1 overflow-hidden pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0">
           <Sidebar />
-          <main className="flex flex-1 flex-col overflow-hidden p-3">
+          <main
+            className="flex flex-1 flex-col overflow-hidden p-1.5 md:p-3"
+            aria-label="Seating chart floor plan"
+          >
             <TablesCanvas />
           </main>
         </div>
+        <SeoFooter />
       </div>
+
+      <MobileBottomBar exportViewRef={exportViewRef} />
 
       <ExportView ref={exportViewRef} />
       <GuideModal />

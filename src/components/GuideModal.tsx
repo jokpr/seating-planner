@@ -54,17 +54,20 @@ export function GuideModal() {
 
   return (
     <div
-      className="fixed inset-0 z-[100] flex items-center justify-center bg-ink/40 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-end justify-center bg-ink/40 p-0 backdrop-blur-sm sm:items-center sm:p-4"
       onClick={() => setGuideOpen(false)}
     >
       <div
-        className="max-h-[85vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-border bg-white p-6 shadow-2xl scrollbar-thin"
+        className="max-h-[90dvh] w-full max-w-lg overflow-y-auto rounded-t-2xl border border-border bg-white p-5 shadow-2xl scrollbar-thin sm:rounded-2xl sm:p-6"
+        style={{ paddingBottom: 'max(1.25rem, env(safe-area-inset-bottom))' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-start justify-between">
           <div>
             <p className="text-[10px] uppercase tracking-wider text-muted">Welcome to SeatFinder</p>
-            <h2 className="font-serif text-2xl font-semibold text-ink">How it works</h2>
+            <h2 className="font-serif text-2xl font-semibold text-ink">
+              How to plan your wedding seating chart
+            </h2>
           </div>
           <button
             type="button"

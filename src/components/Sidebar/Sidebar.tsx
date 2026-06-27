@@ -6,6 +6,7 @@ import { TableManager } from './TableManager'
 import { ConstraintsManager } from './ConstraintsManager'
 import { WeightsPanel } from './WeightsPanel'
 import { useUiStore } from '../../store/useUiStore'
+import { useIsMobile } from '../../hooks/useMediaQuery'
 
 type Tab = 'guests' | 'groups' | 'tables' | 'rules' | 'weights'
 
@@ -17,14 +18,69 @@ const TABS: { id: Tab; label: string }[] = [
   { id: 'weights', label: 'Weights' },
 ]
 
-export function Sidebar() {
+function SidebarTabs({
+  activeTab,
+  onTabChange,
+}: {
+  activeTab: Tab
+  onTabChange: (tab: Tab) => void
+}) {
+  return (
+    <div className="flex gap-1 overflow-x-auto scrollbar-thin">
+      {TABS.map(({ id, label }) => (
+        <button
+          key={id}
+          type="button"
+          onClick={() => onTabChange(id)}
+          className={`shrink-0 rounded-lg px-3 py-2 text-xs font-medium transition ${
+            activeTab === id
+              ? 'bg-rose/15 text-rose-dark'
+              : 'text-muted hover:bg-cream'
+          }`}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  )
+}
+
+function SidebarPanel({ activeTab }: { activeTab: Tab }) {
+  return (
+    <>
+      {activeTab === 'guests' && <GuestPool />}
+      {activeTab === 'groups' && <GroupManager />}
+      {activeTab === 'tables' && <TableManager />}
+      {activeTab === 'rules' && <ConstraintsManager />}
+      {activeTab === 'weights' && <WeightsPanel />}
+    </>
+  )
+}
+
+export function SidebarContent() {
   const [activeTab, setActiveTab] = useState<Tab>('guests')
+
+  return (
+    <>
+      <SidebarTabs activeTab={activeTab} onTabChange={setActiveTab} />
+      <div className="mt-4">
+        <SidebarPanel activeTab={activeTab} />
+      </div>
+    </>
+  )
+}
+
+export function Sidebar() {
+  const isMobile = useIsMobile()
   const collapsed = useUiStore((s) => s.sidebarCollapsed)
   const setCollapsed = useUiStore((s) => s.setSidebarCollapsed)
+  const [activeTab, setActiveTab] = useState<Tab>('guests')
+
+  if (isMobile) return null
 
   if (collapsed) {
     return (
-      <aside className="flex w-12 shrink-0 flex-col items-center border-r border-border bg-white py-3">
+      <aside className="hidden w-12 shrink-0 flex-col items-center border-r border-border bg-white py-3 md:flex">
         <button
           type="button"
           onClick={() => setCollapsed(false)}
@@ -42,7 +98,7 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="flex w-80 shrink-0 flex-col border-r border-border bg-white">
+    <aside className="hidden w-80 shrink-0 flex-col border-r border-border bg-white md:flex">
       <div className="flex items-center justify-between border-b border-border px-4 py-3">
         <h2 className="font-serif text-lg font-semibold text-ink">Plan</h2>
         <button
@@ -55,29 +111,12 @@ export function Sidebar() {
         </button>
       </div>
 
-      <div className="flex gap-1 overflow-x-auto border-b border-border px-2 py-2 scrollbar-thin">
-        {TABS.map(({ id, label }) => (
-          <button
-            key={id}
-            type="button"
-            onClick={() => setActiveTab(id)}
-            className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-medium transition ${
-              activeTab === id
-                ? 'bg-rose/15 text-rose-dark'
-                : 'text-muted hover:bg-cream'
-            }`}
-          >
-            {label}
-          </button>
-        ))}
+      <div className="border-b border-border px-2 py-2">
+        <SidebarTabs activeTab={activeTab} onTabChange={setActiveTab} />
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 scrollbar-thin">
-        {activeTab === 'guests' && <GuestPool />}
-        {activeTab === 'groups' && <GroupManager />}
-        {activeTab === 'tables' && <TableManager />}
-        {activeTab === 'rules' && <ConstraintsManager />}
-        {activeTab === 'weights' && <WeightsPanel />}
+        <SidebarPanel activeTab={activeTab} />
       </div>
     </aside>
   )

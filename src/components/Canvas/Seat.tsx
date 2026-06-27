@@ -4,6 +4,7 @@ import { cn } from '../../lib/utils'
 import { seatDropId } from '../../lib/dnd/types'
 import { useSeatingStore } from '../../store/useSeatingStore'
 import { RULE_META, useUiStore } from '../../store/useUiStore'
+import { useIsMobile } from '../../hooks/useMediaQuery'
 import { GuestChip } from '../GuestChip'
 import { GuestSeatMenu } from './GuestSeatMenu'
 
@@ -40,6 +41,7 @@ export function Seat({
   const cancelLink = useUiStore((s) => s.cancelLink)
   const showToast = useUiStore((s) => s.showToast)
   const addConstraint = useSeatingStore((s) => s.addConstraint)
+  const isMobile = useIsMobile()
 
   const isLinking = linkType !== null
   const isLinkSource = guest?.id === linkSourceId && linkSourceId !== '__toolbar__'
@@ -90,6 +92,7 @@ export function Seat({
             onClick={handleGuestClick}
             selected={isLinkSource}
             pickable={isPickable}
+            touchFriendly={isMobile}
           />
           {isMenuOpen && <GuestSeatMenu guest={guest} />}
         </div>

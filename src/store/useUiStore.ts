@@ -40,6 +40,8 @@ interface UiStore {
   selectedTableId: string | null
   /** Whether the options sidebar is collapsed */
   sidebarCollapsed: boolean
+  /** Mobile bottom sheet panel */
+  mobileSheet: 'plan' | 'tools' | 'more' | null
 
   openMenu: (guestId: string) => void
   closeMenu: () => void
@@ -52,6 +54,8 @@ interface UiStore {
   nudgeCanvasPan: (dx: number, dy: number) => void
   setSelectedTableId: (tableId: string | null) => void
   setSidebarCollapsed: (collapsed: boolean) => void
+  setMobileSheet: (sheet: 'plan' | 'tools' | 'more' | null) => void
+  toggleMobileSheet: (sheet: 'plan' | 'tools' | 'more') => void
 }
 
 let toastTimer: ReturnType<typeof setTimeout> | null = null
@@ -65,6 +69,7 @@ export const useUiStore = create<UiStore>((set) => ({
   canvasPan: { x: 0, y: 0 },
   selectedTableId: null,
   sidebarCollapsed: true,
+  mobileSheet: null,
 
   openMenu: (guestId) => set({ menuGuestId: guestId }),
   closeMenu: () => set({ menuGuestId: null }),
@@ -86,4 +91,7 @@ export const useUiStore = create<UiStore>((set) => ({
     set((s) => ({ canvasPan: { x: s.canvasPan.x + dx, y: s.canvasPan.y + dy } })),
   setSelectedTableId: (tableId) => set({ selectedTableId: tableId }),
   setSidebarCollapsed: (collapsed) => set({ sidebarCollapsed: collapsed }),
+  setMobileSheet: (sheet) => set({ mobileSheet: sheet }),
+  toggleMobileSheet: (sheet) =>
+    set((s) => ({ mobileSheet: s.mobileSheet === sheet ? null : sheet })),
 }))
