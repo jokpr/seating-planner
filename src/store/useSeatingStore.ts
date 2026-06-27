@@ -29,7 +29,7 @@ interface SeatingStore extends SeatingPlanState {
   applyOptimizerResult: (assignments: { guestId: string; tableId: string; seatIndex: number }[]) => void
 
   // Groups
-  addGroup: (name: string) => void
+  addGroup: (name: string) => string
   updateGroup: (id: string, updates: Partial<Pick<Group, 'name' | 'color'>>) => void
   removeGroup: (id: string) => void
 
@@ -167,17 +167,20 @@ export const useSeatingStore = create<SeatingStore>()(
           }
         }),
 
-      addGroup: (name) =>
+      addGroup: (name) => {
+        const id = createId()
         set((s) => ({
           groups: [
             ...s.groups,
             {
-              id: createId(),
+              id,
               name,
               color: GROUP_COLORS[s.groups.length % GROUP_COLORS.length],
             },
           ],
-        })),
+        }))
+        return id
+      },
 
       updateGroup: (id, updates) =>
         set((s) => ({

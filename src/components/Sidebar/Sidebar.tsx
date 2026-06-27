@@ -1,10 +1,11 @@
 import { useState } from 'react'
-import { ChevronDown, ChevronUp } from 'lucide-react'
+import { ChevronDown, ChevronUp, SlidersHorizontal } from 'lucide-react'
 import { GuestPool } from './GuestPool'
 import { GroupManager } from './GroupManager'
 import { TableManager } from './TableManager'
 import { ConstraintsManager } from './ConstraintsManager'
 import { WeightsPanel } from './WeightsPanel'
+import { useUiStore } from '../../store/useUiStore'
 
 type Tab = 'guests' | 'groups' | 'tables' | 'rules' | 'weights'
 
@@ -18,18 +19,23 @@ const TABS: { id: Tab; label: string }[] = [
 
 export function Sidebar() {
   const [activeTab, setActiveTab] = useState<Tab>('guests')
-  const [collapsed, setCollapsed] = useState(false)
+  const collapsed = useUiStore((s) => s.sidebarCollapsed)
+  const setCollapsed = useUiStore((s) => s.setSidebarCollapsed)
 
   if (collapsed) {
     return (
-      <aside className="flex w-12 shrink-0 flex-col items-center border-r border-border bg-white py-4">
+      <aside className="flex w-12 shrink-0 flex-col items-center border-r border-border bg-white py-3">
         <button
           type="button"
           onClick={() => setCollapsed(false)}
-          className="rounded-lg p-2 hover:bg-cream"
-          title="Expand sidebar"
+          className="flex flex-col items-center gap-2 rounded-lg p-2 text-muted hover:bg-cream hover:text-ink"
+          title="Open options"
         >
+          <SlidersHorizontal className="h-4 w-4" />
           <ChevronDown className="h-4 w-4 rotate-[-90deg]" />
+          <span className="mt-1 [writing-mode:vertical-rl] text-[10px] font-semibold uppercase tracking-wider">
+            Options
+          </span>
         </button>
       </aside>
     )

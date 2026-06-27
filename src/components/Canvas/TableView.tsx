@@ -48,6 +48,7 @@ export function TableView({
   const roundSize = Math.min(dims.width, dims.height) * 0.52
 
   const dragStyle = transform ? { transform: CSS.Translate.toString(transform) } : undefined
+  const dragHandleProps = { ...listeners, ...attributes }
 
   return (
     <div
@@ -66,14 +67,15 @@ export function TableView({
       <div
         className={cn(
           'group/header mb-2 flex items-center justify-center gap-1 text-center text-sm font-semibold tracking-wide',
+          !isSelected && 'cursor-grab active:cursor-grabbing',
           hasTableConflict ? 'text-red-500' : 'text-ink/80',
         )}
+        {...(!isSelected ? dragHandleProps : {})}
       >
         <button
           type="button"
-          className="cursor-grab rounded p-0.5 text-muted opacity-0 transition hover:bg-cream hover:text-ink group-hover/header:opacity-100 active:cursor-grabbing"
-          {...listeners}
-          {...attributes}
+          className="cursor-grab rounded p-0.5 text-muted transition hover:bg-cream hover:text-ink active:cursor-grabbing"
+          {...dragHandleProps}
           title="Drag table"
           onClick={(e) => e.stopPropagation()}
         >
@@ -138,9 +140,12 @@ export function TableView({
       >
         <div
           className={cn(
-            'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 border-2 bg-gradient-to-br from-white to-cream/80 shadow-md backdrop-blur-sm',
+            'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 cursor-grab border-2 bg-gradient-to-br from-white to-cream/80 shadow-md backdrop-blur-sm transition active:cursor-grabbing',
+            isDragging ? 'scale-[1.02]' : 'hover:border-rose/50 hover:shadow-lg',
             hasTableConflict ? 'border-red-300' : 'border-border/80',
           )}
+          {...dragHandleProps}
+          title="Drag table"
           style={
             table.shape === 'round'
               ? { width: roundSize, height: roundSize, borderRadius: '9999px' }

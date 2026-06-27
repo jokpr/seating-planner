@@ -2,17 +2,22 @@ import { createId } from '../lib/utils'
 import type { SeatingPlanState } from '../types'
 import { DEFAULT_WEIGHTS, GROUP_COLORS } from '../types'
 
-/** A clean starting point: a few empty tables, no guests yet. */
+/** A clean starting point: a few empty tables with the couple seated as an example. */
 export function createEmptyState(): SeatingPlanState {
+  const headTable = createId()
+
   return {
-    projectName: 'Our Wedding',
+    projectName: 'Paulina & Marius',
     groups: [],
     tables: [
-      { id: createId(), name: 'Head Table', shape: 'head', capacity: 4, x: 60, y: 40 },
+      { id: headTable, name: 'Head Table', shape: 'head', capacity: 4, x: 60, y: 40 },
       { id: createId(), name: 'Table 1', shape: 'round', capacity: 8, x: 60, y: 260 },
       { id: createId(), name: 'Table 2', shape: 'round', capacity: 8, x: 420, y: 260 },
     ],
-    guests: [],
+    guests: [
+      { id: createId(), name: 'Paulina', locked: false, seat: { tableId: headTable, seatIndex: 0 } },
+      { id: createId(), name: 'Marius', locked: false, seat: { tableId: headTable, seatIndex: 1 } },
+    ],
     constraints: {
       sameTableBlacklist: [],
       adjacencyBlacklist: [],

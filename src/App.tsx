@@ -12,7 +12,6 @@ import { Circle, LayoutGrid, Minus } from 'lucide-react'
 import { Sidebar } from './components/Sidebar/Sidebar'
 import { TopBar } from './components/TopBar'
 import { TablesCanvas } from './components/Canvas/TablesCanvas'
-import { ConflictPanel } from './components/ConflictPanel'
 import { ExportView } from './components/ExportView'
 import { GuestChip } from './components/GuestChip'
 import { GuideModal } from './components/GuideModal'
@@ -51,6 +50,7 @@ function App() {
   const setGuideOpen = useUiStore((s) => s.setGuideOpen)
   const cancelLink = useUiStore((s) => s.cancelLink)
   const linkType = useUiStore((s) => s.linkType)
+  const setSidebarCollapsed = useUiStore((s) => s.setSidebarCollapsed)
   const exportViewRef = useRef<HTMLDivElement>(null)
 
   const [activeGuestId, setActiveGuestId] = useState<string | null>(null)
@@ -74,6 +74,7 @@ function App() {
   const groupMap = new Map(groups.map((g) => [g.id, g]))
 
   const handleDragStart = (event: DragStartEvent) => {
+    setSidebarCollapsed(true)
     if (linkType) cancelLink()
     const guestId = parseGuestDragId(String(event.active.id))
     if (guestId) {
@@ -142,8 +143,7 @@ function App() {
         <TopBar exportViewRef={exportViewRef} />
         <div className="flex flex-1 overflow-hidden">
           <Sidebar />
-          <main className="flex flex-1 flex-col gap-3 overflow-hidden p-4">
-            <ConflictPanel />
+          <main className="flex flex-1 flex-col overflow-hidden p-3">
             <TablesCanvas />
           </main>
         </div>

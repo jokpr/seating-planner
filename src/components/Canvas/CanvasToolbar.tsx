@@ -19,6 +19,7 @@ import { cn } from '../../lib/utils'
 import { useGuestConflictIds } from '../../hooks/useConflicts'
 import { GuestChip } from '../GuestChip'
 import { GuestPoolDropZone } from './TablesCanvas'
+import { GuestSeatMenu } from './GuestSeatMenu'
 
 const TABLE_TEMPLATES: { shape: TableShape; label: string; capacity: number; icon: typeof Circle }[] = [
   { shape: 'round', label: 'Round', capacity: 8, icon: Circle },
@@ -53,74 +54,74 @@ export function CanvasToolbar() {
   }
 
   return (
-    <div className="pointer-events-auto absolute left-4 top-4 z-20 flex max-w-[calc(100%-2rem)] flex-col gap-3">
-      <div className="rounded-2xl border border-border/80 bg-white/95 p-3 shadow-lg backdrop-blur-md">
-        <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted">
+    <div className="pointer-events-auto absolute left-3 top-3 z-20 flex max-w-[min(24rem,calc(100%-1.5rem))] flex-col gap-2">
+      <div className="rounded-xl border border-border/80 bg-white/95 p-2 shadow-md backdrop-blur-md">
+        <p className="mb-1.5 text-[9px] font-semibold uppercase tracking-wider text-muted">
           Quick add
         </p>
-        <div className="flex gap-2">
+        <div className="flex gap-1.5">
           <input
             type="text"
             value={guestName}
             onChange={(e) => setGuestName(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleAddGuest()}
             placeholder="Guest name..."
-            className="min-w-0 flex-1 rounded-xl border border-border bg-cream/40 px-3 py-2 text-sm outline-none focus:border-rose focus:ring-2 focus:ring-rose/20"
+            className="min-w-0 flex-1 rounded-lg border border-border bg-cream/40 px-2.5 py-1.5 text-xs outline-none focus:border-rose focus:ring-2 focus:ring-rose/20"
           />
           <button
             type="button"
             onClick={handleAddGuest}
-            className="flex shrink-0 items-center gap-1.5 rounded-xl bg-gradient-to-r from-rose to-rose-dark px-3 py-2 text-sm font-medium text-white shadow-sm hover:shadow-md"
+            className="flex shrink-0 items-center gap-1 rounded-lg bg-gradient-to-r from-rose to-rose-dark px-2.5 py-1.5 text-xs font-medium text-white shadow-sm hover:shadow-md"
           >
-            <UserPlus className="h-4 w-4" />
+            <UserPlus className="h-3.5 w-3.5" />
             Add
           </button>
         </div>
         {guests.length > 0 && (
-          <p className="mt-2 text-[11px] text-muted">
+          <p className="mt-1.5 text-[10px] text-muted">
             {guests.filter((g) => !g.seat).length} waiting · drag guests from the dock below
           </p>
         )}
       </div>
 
-      <div className="rounded-2xl border border-border/80 bg-white/95 p-3 shadow-lg backdrop-blur-md">
-        <p className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted">
+      <div className="rounded-xl border border-border/80 bg-white/95 p-2 shadow-md backdrop-blur-md">
+        <p className="mb-1.5 text-[9px] font-semibold uppercase tracking-wider text-muted">
           Drag tables onto floor
         </p>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap gap-1.5">
           {TABLE_TEMPLATES.map(({ shape, label, capacity, icon: Icon }) => (
             <TableTemplateChip key={shape} shape={shape} label={label} capacity={capacity} icon={Icon} />
           ))}
         </div>
       </div>
 
-      <div className="rounded-2xl border border-border/80 bg-white/95 p-3 shadow-lg backdrop-blur-md">
-        <div className="mb-2 flex items-center gap-1.5">
-          <Wand2 className="h-3.5 w-3.5 text-rose-dark" />
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-muted">
+      <div className="rounded-xl border border-border/80 bg-white/95 p-2 shadow-md backdrop-blur-md">
+        <div className="mb-1.5 flex items-center gap-1">
+          <Wand2 className="h-3 w-3 text-rose-dark" />
+          <p className="text-[9px] font-semibold uppercase tracking-wider text-muted">
             Seating rules
           </p>
         </div>
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-wrap gap-1">
           {RULE_OPTIONS.map(({ type, icon: Icon }) => (
             <button
               key={type}
               type="button"
               onClick={() => beginRuleFromToolbar(type)}
               className={cn(
-                'flex items-center gap-2 rounded-xl px-2.5 py-2 text-left text-xs transition',
+                'flex items-center gap-1.5 rounded-lg px-2 py-1.5 text-left text-[11px] transition',
                 linkType === type
                   ? 'bg-rose/15 text-rose-dark ring-1 ring-rose/40'
                   : 'text-ink hover:bg-cream',
               )}
             >
-              <Icon className="h-3.5 w-3.5 shrink-0 text-muted" />
+              <Icon className="h-3 w-3 shrink-0 text-muted" />
               {RULE_META[type].label}
             </button>
           ))}
         </div>
         {linkType && (
-          <p className="mt-2 rounded-lg bg-cream/80 px-2 py-1.5 text-[10px] text-muted">
+          <p className="mt-1.5 rounded-lg bg-cream/80 px-2 py-1 text-[10px] text-muted">
             Click two guests on the map to create this rule
           </p>
         )}
@@ -154,11 +155,11 @@ function TableTemplateChip({
       {...listeners}
       {...attributes}
       className={cn(
-        'flex cursor-grab items-center gap-1.5 rounded-xl border border-border bg-cream/50 px-3 py-2 text-xs font-medium text-ink shadow-sm transition hover:border-rose/50 hover:bg-white active:cursor-grabbing',
+        'flex cursor-grab items-center gap-1 rounded-lg border border-border bg-cream/50 px-2 py-1.5 text-[11px] font-medium text-ink shadow-sm transition hover:border-rose/50 hover:bg-white active:cursor-grabbing',
         isDragging && 'z-50 opacity-60 shadow-lg',
       )}
     >
-      <Icon className="h-3.5 w-3.5 text-rose-dark" />
+      <Icon className="h-3 w-3 text-rose-dark" />
       {label}
       <span className="text-muted">({capacity})</span>
     </div>
@@ -173,6 +174,8 @@ export function CanvasGuestDock() {
   const addConstraint = useSeatingStore((s) => s.addConstraint)
   const linkType = useUiStore((s) => s.linkType)
   const linkSourceId = useUiStore((s) => s.linkSourceId)
+  const menuGuestId = useUiStore((s) => s.menuGuestId)
+  const openMenu = useUiStore((s) => s.openMenu)
   const startLink = useUiStore((s) => s.startLink)
   const cancelLink = useUiStore((s) => s.cancelLink)
   const showToast = useUiStore((s) => s.showToast)
@@ -202,29 +205,35 @@ export function CanvasGuestDock() {
   if (guests.length === 0) return null
 
   return (
-    <div className="pointer-events-auto absolute bottom-4 left-4 right-4 z-20 mx-auto max-w-3xl">
+    <div className="pointer-events-auto absolute bottom-3 left-3 right-3 z-20 mx-auto max-w-2xl">
       <GuestPoolDropZone>
-        <div className="mb-1.5 flex items-center justify-between">
-          <p className="text-xs font-semibold text-ink">Guest dock</p>
+        <div className="mb-1 flex items-center justify-between">
+          <p className="text-[11px] font-semibold text-ink">Guest dock</p>
           <p className="text-[10px] text-muted">{unassigned.length} unassigned — drag onto seats</p>
         </div>
         {unassigned.length === 0 ? (
-          <p className="py-2 text-center text-xs text-muted">
+          <p className="py-1.5 text-center text-xs text-muted">
             Everyone is seated — drop a guest here to unassign
           </p>
         ) : (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex max-h-28 flex-wrap gap-1.5 overflow-y-auto pr-1 scrollbar-thin">
             {unassigned.map((guest) => (
-              <div key={guest.id} className="group relative">
+              <div
+                key={guest.id}
+                className={`group relative ${menuGuestId === guest.id && !linkType ? 'z-50' : ''}`}
+              >
                 <GuestChip
                   guest={guest}
                   group={guest.groupId ? groupMap.get(guest.groupId) : undefined}
                   hasConflict={conflictIds.has(guest.id)}
                   onToggleLock={() => toggleGuestLock(guest.id)}
-                  onClick={linkType ? () => handleRuleGuestClick(guest) : undefined}
+                  onClick={linkType ? () => handleRuleGuestClick(guest) : () => openMenu(guest.id)}
                   pickable={!!linkType && guest.id !== linkSourceId}
                   selected={guest.id === linkSourceId}
                 />
+                {menuGuestId === guest.id && !linkType && (
+                  <GuestSeatMenu guest={guest} placement="top" />
+                )}
                 <button
                   type="button"
                   onClick={() => removeGuest(guest.id)}

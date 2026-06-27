@@ -24,11 +24,18 @@ export function TablesCanvas() {
   const setGuideOpen = useUiStore((s) => s.setGuideOpen)
   const canvasPan = useUiStore((s) => s.canvasPan)
   const setSelectedTableId = useUiStore((s) => s.setSelectedTableId)
+  const setSidebarCollapsed = useUiStore((s) => s.setSidebarCollapsed)
 
   const viewportRef = useRef<HTMLDivElement>(null)
-  const panState = useRef<{ active: boolean; startX: number; startY: number; panX: number; panY: number } | null>(
-    null,
-  )
+  const suppressBackgroundClick = useRef(false)
+  const panState = useRef<{
+    active: boolean
+    moved: boolean
+    startX: number
+    startY: number
+    panX: number
+    panY: number
+  } | null>(null)
 
   const linkSourceName =
     linkSourceId && linkSourceId !== '__toolbar__'
@@ -55,22 +62,25 @@ export function TablesCanvas() {
       if (target.closest('[data-no-pan]')) return
       if (target.closest('button, input, select, textarea, [role="button"]')) return
 
+      setSidebarCollapsed(true)
       e.currentTarget.setPointerCapture(e.pointerId)
       panState.current = {
         active: true,
+        moved: false,
         startX: e.clientX,
         startY: e.clientY,
         panX: canvasPan.x,
         panY: canvasPan.y,
       }
     },
-    [canvasPan.x, canvasPan.y],
+    [canvasPan.x, canvasPan.y, setSidebarCollapsed],
   )
 
   const handlePanPointerMove = useCallback((e: React.PointerEvent) => {
     if (!panState.current?.active) return
     const dx = e.clientX - panState.current.startX
     const dy = e.clientY - panState.current.startY
+    if (Math.abs(dx) + Math.abs(dy) > 3) panState.current.moved = true
     useUiStore.getState().setCanvasPan({
       x: panState.current.panX + dx,
       y: panState.current.panY + dy,
@@ -79,12 +89,23 @@ export function TablesCanvas() {
 
   const handlePanPointerUp = useCallback((e: React.PointerEvent) => {
     if (panState.current?.active) {
+      suppressBackgroundClick.current = panState.current.moved
+      window.setTimeout(() => {
+        suppressBackgroundClick.current = false
+      }, 0)
       panState.current = null
-      e.currentTarget.releasePointerCapture(e.pointerId)
+      if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+        e.currentTarget.releasePointerCapture(e.pointerId)
+      }
     }
   }, [])
 
-  const handleBackgroundClick = useCallback(() => {
+  const handleBackgroundClick = useCallback((e: React.MouseEvent) => {
+    if ((e.target as HTMLElement).closest('[data-no-pan]')) return
+    if (suppressBackgroundClick.current) {
+      suppressBackgroundClick.current = false
+      return
+    }
     setSelectedTableId(null)
   }, [setSelectedTableId])
 
@@ -92,7 +113,7 @@ export function TablesCanvas() {
     <div className="canvas-floor relative h-full min-h-[560px] flex-1 overflow-hidden rounded-2xl border border-border shadow-inner">
       <div
         ref={viewportRef}
-        className="canvas-viewport h-full w-full overflow-auto scrollbar-thin"
+        className="canvas-viewport h-full w-full overflow-hidden"
         onPointerDown={handlePanPointerDown}
         onPointerMove={handlePanPointerMove}
         onPointerUp={handlePanPointerUp}
@@ -185,9 +206,9 @@ export function TablesCanvas() {
       )}
 
       {!showOnboarding && guests.filter((g) => !g.seat).length === 0 && (
-        <div className="pointer-events-none absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-white/80 px-3 py-1.5 text-[10px] text-muted shadow-sm backdrop-blur">
+        <div className="pointer-events-none absolute bottom-3 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1.5 rounded-full bg-white/75 px-2.5 py-1 text-[10px] text-muted shadow-sm backdrop-blur">
           <Move className="h-3 w-3" />
-          Drag empty floor to pan
+          Drag floor to pan
         </div>
       )}
     </div>
@@ -203,7 +224,7 @@ function CanvasWorld({
   bounds: { w: number; h: number }
   pan: { x: number; y: number }
   children: React.ReactNode
-  onBackgroundClick: () => void
+  onBackgroundClick: (e: React.MouseEvent) => void
 }) {
   const { setNodeRef, isOver } = useDroppable({
     id: CANVAS_DROP_ID,
@@ -219,14 +240,6 @@ function CanvasWorld({
         minWidth: bounds.w,
         minHeight: bounds.h,
         transform: `translate(${pan.x}px, ${pan.y}px)`,
-        backgroundImage: `
-          radial-gradient(circle at 20% 20%, rgba(232, 160, 191, 0.08) 0%, transparent 50%),
-          radial-gradient(circle at 80% 80%, rgba(143, 166, 143, 0.08) 0%, transparent 50%),
-          linear-gradient(to right, rgba(232, 228, 223, 0.4) 1px, transparent 1px),
-          linear-gradient(to bottom, rgba(232, 228, 223, 0.4) 1px, transparent 1px)
-        `,
-        backgroundSize: '100% 100%, 100% 100%, 40px 40px, 40px 40px',
-        backgroundColor: 'var(--color-cream)',
       }}
       onClick={onBackgroundClick}
     >
@@ -245,7 +258,7 @@ export function GuestPoolDropZone({ children }: { children: React.ReactNode }) {
     <div
       ref={setNodeRef}
       data-no-pan
-      className={`min-h-[72px] rounded-2xl border-2 border-dashed p-3 shadow-lg backdrop-blur-md transition-colors ${
+      className={`min-h-[58px] rounded-xl border-2 border-dashed p-2 shadow-md backdrop-blur-md transition-colors ${
         isOver ? 'border-rose bg-rose/10' : 'border-border/80 bg-white/95'
       }`}
     >

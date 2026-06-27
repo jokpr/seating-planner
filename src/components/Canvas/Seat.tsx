@@ -44,6 +44,7 @@ export function Seat({
   const isLinking = linkType !== null
   const isLinkSource = guest?.id === linkSourceId && linkSourceId !== '__toolbar__'
   const isPickable = isLinking && !!guest && guest.id !== linkSourceId
+  const isMenuOpen = menuGuestId === guest?.id && !isLinking
 
   const handleGuestClick = () => {
     if (!guest) return
@@ -72,7 +73,10 @@ export function Seat({
     <div
       ref={setNodeRef}
       data-no-pan
-      className="absolute -translate-x-1/2 -translate-y-1/2"
+      className={cn(
+        'absolute -translate-x-1/2 -translate-y-1/2',
+        isMenuOpen ? 'z-50' : 'z-0',
+      )}
       style={{ left: x, top: y }}
     >
       {guest ? (
@@ -87,7 +91,7 @@ export function Seat({
             selected={isLinkSource}
             pickable={isPickable}
           />
-          {menuGuestId === guest.id && !isLinking && <GuestSeatMenu guest={guest} />}
+          {isMenuOpen && <GuestSeatMenu guest={guest} />}
         </div>
       ) : (
         <div

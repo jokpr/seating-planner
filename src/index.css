@@ -40,7 +40,14 @@
   }
 
   .canvas-floor {
-    background: linear-gradient(145deg, #faf8f5 0%, #f5f0ea 50%, #faf8f5 100%);
+    background-color: var(--color-cream);
+    background-image:
+      radial-gradient(circle at 20% 20%, rgba(232, 160, 191, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(143, 166, 143, 0.08) 0%, transparent 50%),
+      linear-gradient(to right, rgba(232, 228, 223, 0.55) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(232, 228, 223, 0.55) 1px, transparent 1px),
+      linear-gradient(145deg, #faf8f5 0%, #f5f0ea 50%, #faf8f5 100%);
+    background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px, 100% 100%;
   }
 
   .canvas-viewport {
