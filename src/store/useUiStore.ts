@@ -19,7 +19,7 @@ export const RULE_META: Record<
   },
   mustSitTogether: {
     label: 'Keep together',
-    verb: 'should sit with',
+    verb: 'should sit next to',
     tone: 'good',
   },
 }

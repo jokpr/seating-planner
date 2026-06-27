@@ -5,7 +5,7 @@ import type { Weights } from '../../types'
 
 const WEIGHT_LABELS: { key: keyof Weights; label: string; hint: string }[] = [
   { key: 'groupTogether', label: 'Keep groups together', hint: 'Penalize splitting households across tables' },
-  { key: 'mustSitTogether', label: 'Prefer-together pairs', hint: 'Honor soft "sit together" preferences' },
+  { key: 'mustSitTogether', label: 'Prefer-together pairs', hint: 'Seat linked guests in adjacent chairs' },
   { key: 'tableBalance', label: 'Balance table sizes', hint: 'Avoid one packed table and one empty' },
   { key: 'emptySeat', label: 'Minimize empty seats', hint: 'Prefer filling tables evenly' },
 ]

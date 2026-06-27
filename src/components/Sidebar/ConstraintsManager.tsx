@@ -26,7 +26,7 @@ const CONSTRAINT_TYPES: {
   {
     key: 'mustSitTogether',
     label: 'Prefer together',
-    description: 'Soft preference to seat together',
+    description: 'Soft preference to seat directly next to each other',
     icon: Heart,
   },
 ]

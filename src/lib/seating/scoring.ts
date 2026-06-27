@@ -133,14 +133,28 @@ export function scoreAssignment(
     }
   }
 
-  // Must sit together (soft)
+  // Must sit together (soft) — same table and directly adjacent
   for (const pair of constraints.mustSitTogether) {
     const a = assignment.byGuest.get(pair.guestA)
     const b = assignment.byGuest.get(pair.guestB)
-    if (a && b && a.tableId !== b.tableId) {
-      cost += weights.mustSitTogether
-    } else if ((a && !b) || (!a && b)) {
+    if ((a && !b) || (!a && b)) {
       cost += weights.mustSitTogether * 0.5
+      continue
+    }
+    if (!a || !b) continue
+
+    if (a.tableId !== b.tableId) {
+      cost += weights.mustSitTogether
+      continue
+    }
+
+    const table = tables.find((t) => t.id === a.tableId)
+    if (!table) continue
+
+    const adjacency = getAdjacencyMap(table.shape, table.capacity)
+    const neighborsA = adjacency.get(a.seatIndex) ?? []
+    if (!neighborsA.includes(b.seatIndex)) {
+      cost += weights.mustSitTogether
     }
   }
 
