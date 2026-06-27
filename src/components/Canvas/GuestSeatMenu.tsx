@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react'
+import { createPortal } from 'react-dom'
 import { Ban, Heart, Lock, Palette, Plus, Unlock, UserX, X } from 'lucide-react'
 import type { Guest } from '../../types'
 import { useSeatingStore } from '../../store/useSeatingStore'
@@ -11,11 +12,58 @@ const RULE_ICON: Record<RuleType, typeof Ban> = {
   mustSitTogether: Heart,
 }
 
+const MENU_WIDTH = 256
+const VIEWPORT_PADDING = 8
+const ANCHOR_GAP = 8
+
+function computeAnchoredPosition(
+  anchorRect: DOMRect,
+  menuHeight: number,
+  preferredPlacement: 'top' | 'bottom',
+) {
+  const vw = window.innerWidth
+  const vh = window.innerHeight
+
+  let left = anchorRect.left + anchorRect.width / 2 - MENU_WIDTH / 2
+  left = Math.max(VIEWPORT_PADDING, Math.min(left, vw - MENU_WIDTH - VIEWPORT_PADDING))
+
+  const spaceBelow = vh - VIEWPORT_PADDING - (anchorRect.bottom + ANCHOR_GAP)
+  const spaceAbove = anchorRect.top - ANCHOR_GAP - VIEWPORT_PADDING
+
+  const preferBelow = preferredPlacement === 'bottom'
+  const placeBelow =
+    preferBelow
+      ? spaceBelow >= menuHeight || spaceBelow >= spaceAbove
+      : spaceBelow > spaceAbove && spaceBelow >= menuHeight
+
+  if (placeBelow) {
+    return {
+      top: anchorRect.bottom + ANCHOR_GAP,
+      left,
+      maxHeight: Math.max(160, spaceBelow),
+    }
+  }
+
+  const visibleHeight = Math.min(menuHeight, spaceAbove)
+  let top = anchorRect.top - ANCHOR_GAP - visibleHeight
+  if (top < VIEWPORT_PADDING) {
+    top = VIEWPORT_PADDING
+  }
+
+  return {
+    top,
+    left,
+    maxHeight: Math.max(160, anchorRect.top - ANCHOR_GAP - top),
+  }
+}
+
 export function GuestSeatMenu({
   guest,
+  anchorRef,
   placement = 'bottom',
 }: {
   guest: Guest
+  anchorRef: RefObject<HTMLElement | null>
   placement?: 'top' | 'bottom'
 }) {
   const isMobile = useIsMobile()
@@ -28,6 +76,44 @@ export function GuestSeatMenu({
   const startLink = useUiStore((s) => s.startLink)
   const showToast = useUiStore((s) => s.showToast)
   const [newGroupName, setNewGroupName] = useState('')
+  const menuRef = useRef<HTMLDivElement>(null)
+  const [menuPosition, setMenuPosition] = useState<{
+    top: number
+    left: number
+    maxHeight: number
+  } | null>(null)
+  const canvasPan = useUiStore((s) => s.canvasPan)
+
+  useLayoutEffect(() => {
+    if (isMobile) return
+
+    const updatePosition = () => {
+      const anchor = anchorRef.current
+      const menu = menuRef.current
+      if (!anchor || !menu) return
+      const anchorRect = anchor.getBoundingClientRect()
+      const menuHeight = menu.offsetHeight
+      setMenuPosition(computeAnchoredPosition(anchorRect, menuHeight, placement))
+    }
+
+    updatePosition()
+    window.addEventListener('resize', updatePosition)
+    return () => window.removeEventListener('resize', updatePosition)
+  }, [anchorRef, placement, isMobile, canvasPan.x, canvasPan.y, groups.length, guest.id])
+
+  useEffect(() => {
+    if (isMobile) return
+
+    const handlePointerDown = (event: PointerEvent) => {
+      const target = event.target as Node
+      if (menuRef.current?.contains(target)) return
+      if (anchorRef.current?.contains(target)) return
+      closeMenu()
+    }
+
+    document.addEventListener('pointerdown', handlePointerDown, true)
+    return () => document.removeEventListener('pointerdown', handlePointerDown, true)
+  }, [anchorRef, closeMenu, isMobile])
 
   const beginRule = (type: RuleType) => {
     startLink(guest.id, type)
@@ -171,6 +257,7 @@ export function GuestSeatMenu({
           onClick={closeMenu}
         />
         <div
+          ref={menuRef}
           role="dialog"
           aria-modal="true"
           aria-label={`Actions for ${guest.name}`}
@@ -183,18 +270,33 @@ export function GuestSeatMenu({
     )
   }
 
-  return (
+  return createPortal(
     <>
-      <div className="fixed inset-0 z-40" onClick={closeMenu} />
       <div
-        className={`absolute left-1/2 z-50 w-64 -translate-x-1/2 overflow-hidden rounded-2xl border border-border bg-white shadow-2xl ${
-          placement === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'
+        className="fixed inset-0 z-[60] bg-ink/10"
+        aria-hidden
+        onPointerDown={closeMenu}
+      />
+      <div
+        ref={menuRef}
+        className={`fixed z-[70] w-64 overflow-y-auto overscroll-contain rounded-2xl border border-border bg-white shadow-2xl scrollbar-thin ${
+          menuPosition ? '' : 'invisible'
         }`}
+        style={
+          menuPosition
+            ? {
+                top: menuPosition.top,
+                left: menuPosition.left,
+                maxHeight: menuPosition.maxHeight,
+              }
+            : { top: 0, left: 0 }
+        }
         onClick={(e) => e.stopPropagation()}
       >
         {menuBody}
       </div>
-    </>
+    </>,
+    document.body,
   )
 }
 

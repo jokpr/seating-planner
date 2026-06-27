@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { useDraggable } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
 import {
@@ -13,7 +13,7 @@ import {
 } from 'lucide-react'
 import { useSeatingStore } from '../../store/useSeatingStore'
 import { RULE_META, useUiStore, type RuleType } from '../../store/useUiStore'
-import type { TableShape } from '../../types'
+import type { Guest, TableShape } from '../../types'
 import { tableTemplateDragId } from '../../lib/dnd/types'
 import { cn } from '../../lib/utils'
 import { useGuestConflictIds } from '../../hooks/useConflicts'
@@ -336,43 +336,83 @@ export function CanvasGuestDock() {
             isMobile ? 'max-h-16' : 'max-h-20',
           )}>
             {unassigned.map((guest) => (
-              <div
+              <GuestDockGuestItem
                 key={guest.id}
-                className={cn(
-                  'group relative pt-1.5 pr-0.5',
-                  menuGuestId === guest.id && !linkType && 'z-50',
-                )}
-              >
-                <GuestChip
-                  guest={guest}
-                  group={guest.groupId ? groupMap.get(guest.groupId) : undefined}
-                  hasConflict={conflictIds.has(guest.id)}
-                  onToggleLock={() => toggleGuestLock(guest.id)}
-                  onClick={linkType ? () => handleRuleGuestClick(guest) : () => openMenu(guest.id)}
-                  pickable={!!linkType && guest.id !== linkSourceId}
-                  selected={guest.id === linkSourceId}
-                  touchFriendly={isMobile}
-                  compact
-                />
-                {menuGuestId === guest.id && !linkType && (
-                  <GuestSeatMenu guest={guest} placement="top" />
-                )}
-                <button
-                  type="button"
-                  onClick={() => removeGuest(guest.id)}
-                  className={cn(
-                    'absolute right-0 top-0 z-10 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-red-500 text-white shadow-sm ring-1 ring-white',
-                    isMobile ? 'flex' : 'hidden group-hover:flex',
-                  )}
-                  title="Remove guest"
-                >
-                  <Minus className="h-2 w-2" strokeWidth={3} />
-                </button>
-              </div>
+                guest={guest}
+                group={guest.groupId ? groupMap.get(guest.groupId) : undefined}
+                hasConflict={conflictIds.has(guest.id)}
+                isMenuOpen={menuGuestId === guest.id && !linkType}
+                isPickable={!!linkType && guest.id !== linkSourceId}
+                isSelected={guest.id === linkSourceId}
+                isMobile={isMobile}
+                onToggleLock={() => toggleGuestLock(guest.id)}
+                onClick={linkType ? () => handleRuleGuestClick(guest) : () => openMenu(guest.id)}
+                onRemove={() => removeGuest(guest.id)}
+              />
             ))}
           </div>
         )}
       </GuestPoolDropZone>
+    </div>
+  )
+}
+
+function GuestDockGuestItem({
+  guest,
+  group,
+  hasConflict,
+  isMenuOpen,
+  isPickable,
+  isSelected,
+  isMobile,
+  onToggleLock,
+  onClick,
+  onRemove,
+}: {
+  guest: Guest
+  group?: { id: string; name: string; color: string }
+  hasConflict: boolean
+  isMenuOpen: boolean
+  isPickable: boolean
+  isSelected: boolean
+  isMobile: boolean
+  onToggleLock: () => void
+  onClick: () => void
+  onRemove: () => void
+}) {
+  const anchorRef = useRef<HTMLDivElement>(null)
+
+  return (
+    <div
+      ref={anchorRef}
+      className={cn(
+        'group relative pt-1.5 pr-0.5',
+        isMenuOpen && 'z-50',
+      )}
+    >
+      <GuestChip
+        guest={guest}
+        group={group}
+        hasConflict={hasConflict}
+        onToggleLock={onToggleLock}
+        onClick={onClick}
+        pickable={isPickable}
+        selected={isSelected}
+        touchFriendly={isMobile}
+        compact
+      />
+      {isMenuOpen && <GuestSeatMenu guest={guest} anchorRef={anchorRef} placement="top" />}
+      <button
+        type="button"
+        onClick={onRemove}
+        className={cn(
+          'absolute right-0 top-0 z-10 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-red-500 text-white shadow-sm ring-1 ring-white',
+          isMobile ? 'flex' : 'hidden group-hover:flex',
+        )}
+        title="Remove guest"
+      >
+        <Minus className="h-2 w-2" strokeWidth={3} />
+      </button>
     </div>
   )
 }

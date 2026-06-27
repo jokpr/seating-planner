@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { useDroppable } from '@dnd-kit/core'
 import type { Guest, Group } from '../../types'
 import { cn } from '../../lib/utils'
@@ -42,6 +43,7 @@ export function Seat({
   const showToast = useUiStore((s) => s.showToast)
   const addConstraint = useSeatingStore((s) => s.addConstraint)
   const isMobile = useIsMobile()
+  const anchorRef = useRef<HTMLDivElement>(null)
 
   const isLinking = linkType !== null
   const isLinkSource = guest?.id === linkSourceId && linkSourceId !== '__toolbar__'
@@ -82,7 +84,7 @@ export function Seat({
       style={{ left: x, top: y }}
     >
       {guest ? (
-        <div className="relative">
+        <div ref={anchorRef} className="relative">
           <GuestChip
             guest={guest}
             group={group}
@@ -94,7 +96,7 @@ export function Seat({
             pickable={isPickable}
             touchFriendly={isMobile}
           />
-          {isMenuOpen && <GuestSeatMenu guest={guest} />}
+          {isMenuOpen && <GuestSeatMenu guest={guest} anchorRef={anchorRef} />}
         </div>
       ) : (
         <div
