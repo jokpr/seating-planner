@@ -1,13 +1,16 @@
 import { useRef, useState } from 'react'
 import {
   Download,
+  HelpCircle,
   Image,
   Loader2,
   RefreshCw,
   Sparkles,
+  Trash2,
   Upload,
 } from 'lucide-react'
 import { useSeatingStore, getStoreSnapshot } from '../store/useSeatingStore'
+import { useUiStore } from '../store/useUiStore'
 import { useOptimizer } from '../hooks/useOptimizer'
 import { useConflicts } from '../hooks/useConflicts'
 import { exportJson } from '../lib/export/exportJson'
@@ -22,7 +25,9 @@ export function TopBar({ exportViewRef }: TopBarProps) {
   const projectName = useSeatingStore((s) => s.projectName)
   const setProjectName = useSeatingStore((s) => s.setProjectName)
   const importState = useSeatingStore((s) => s.importState)
-  const resetToSeed = useSeatingStore((s) => s.resetToSeed)
+  const clearAll = useSeatingStore((s) => s.clearAll)
+  const guestCount = useSeatingStore((s) => s.guests.length)
+  const setGuideOpen = useUiStore((s) => s.setGuideOpen)
   const { isRunning, autoArrange, reseatUnlocked } = useOptimizer()
   const { conflicts } = useConflicts()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -163,18 +168,30 @@ export function TopBar({ exportViewRef }: TopBarProps) {
           Import
         </button>
 
+        {guestCount > 0 && (
+          <button
+            type="button"
+            onClick={() => {
+              if (confirm('Clear everything and start a fresh plan?')) {
+                clearAll()
+                setStatus('Cleared — fresh start')
+                setTimeout(() => setStatus(null), 2000)
+              }
+            }}
+            className="hidden items-center gap-1 rounded-lg border border-border px-3 py-2 text-sm text-muted hover:bg-cream lg:flex"
+            title="Clear all and start fresh"
+          >
+            <Trash2 className="h-4 w-4" />
+          </button>
+        )}
+
         <button
           type="button"
-          onClick={() => {
-            if (confirm('Reset to demo data? Your current plan will be replaced.')) {
-              resetToSeed()
-              setStatus('Reset to demo plan')
-              setTimeout(() => setStatus(null), 2000)
-            }
-          }}
-          className="hidden rounded-lg border border-border px-3 py-2 text-xs text-muted hover:bg-cream lg:block"
+          onClick={() => setGuideOpen(true)}
+          className="flex items-center gap-1 rounded-lg border border-border px-3 py-2 text-sm hover:bg-cream"
+          title="How it works"
         >
-          Reset demo
+          <HelpCircle className="h-4 w-4" />
         </button>
 
         <input

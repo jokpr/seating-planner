@@ -2,6 +2,26 @@ import { createId } from '../lib/utils'
 import type { SeatingPlanState } from '../types'
 import { DEFAULT_WEIGHTS, GROUP_COLORS } from '../types'
 
+/** A clean starting point: a few empty tables, no guests yet. */
+export function createEmptyState(): SeatingPlanState {
+  return {
+    projectName: 'Our Wedding',
+    groups: [],
+    tables: [
+      { id: createId(), name: 'Head Table', shape: 'head', capacity: 4, x: 60, y: 40 },
+      { id: createId(), name: 'Table 1', shape: 'round', capacity: 8, x: 60, y: 260 },
+      { id: createId(), name: 'Table 2', shape: 'round', capacity: 8, x: 420, y: 260 },
+    ],
+    guests: [],
+    constraints: {
+      sameTableBlacklist: [],
+      adjacencyBlacklist: [],
+      mustSitTogether: [],
+    },
+    weights: { ...DEFAULT_WEIGHTS },
+  }
+}
+
 export function createSeedState(): SeatingPlanState {
   const brideFamily = createId()
   const groomFamily = createId()
@@ -44,10 +64,10 @@ export function createSeedState(): SeatingPlanState {
       { id: work, name: 'Work Colleagues', color: GROUP_COLORS[3] },
     ],
     tables: [
-      { id: headTable, name: 'Head Table', shape: 'head', capacity: 6, x: 320, y: 40 },
-      { id: table1, name: 'Table 1', shape: 'round', capacity: 8, x: 80, y: 280 },
-      { id: table2, name: 'Table 2', shape: 'round', capacity: 8, x: 400, y: 280 },
-      { id: table3, name: 'Table 3', shape: 'rectangular', capacity: 10, x: 720, y: 260 },
+      { id: headTable, name: 'Head Table', shape: 'head', capacity: 6, x: 80, y: 40 },
+      { id: table1, name: 'Table 1', shape: 'round', capacity: 8, x: 60, y: 280 },
+      { id: table2, name: 'Table 2', shape: 'round', capacity: 8, x: 420, y: 280 },
+      { id: table3, name: 'Table 3', shape: 'rectangular', capacity: 10, x: 780, y: 280 },
     ],
     guests,
     constraints: {

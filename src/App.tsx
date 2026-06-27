@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   DndContext,
   DragOverlay,
@@ -8,24 +8,38 @@ import {
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core'
-import { useState } from 'react'
 import { Sidebar } from './components/Sidebar/Sidebar'
 import { TopBar } from './components/TopBar'
 import { TablesCanvas } from './components/Canvas/TablesCanvas'
 import { ConflictPanel } from './components/ConflictPanel'
 import { ExportView } from './components/ExportView'
 import { GuestChip } from './components/GuestChip'
+import { GuideModal } from './components/GuideModal'
+import { Toast } from './components/Toast'
 import { useSeatingStore } from './store/useSeatingStore'
+import { useUiStore } from './store/useUiStore'
 import { parseGuestDragId, parseSeatDropId } from './lib/dnd/types'
+
+const GUIDE_SEEN_KEY = 'seatfinder-guide-seen'
 
 function App() {
   const guests = useSeatingStore((s) => s.guests)
   const groups = useSeatingStore((s) => s.groups)
   const assignGuestToSeat = useSeatingStore((s) => s.assignGuestToSeat)
   const unassignGuest = useSeatingStore((s) => s.unassignGuest)
+  const setGuideOpen = useUiStore((s) => s.setGuideOpen)
+  const cancelLink = useUiStore((s) => s.cancelLink)
+  const linkType = useUiStore((s) => s.linkType)
   const exportViewRef = useRef<HTMLDivElement>(null)
 
   const [activeGuestId, setActiveGuestId] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!localStorage.getItem(GUIDE_SEEN_KEY)) {
+      setGuideOpen(true)
+      localStorage.setItem(GUIDE_SEEN_KEY, '1')
+    }
+  }, [setGuideOpen])
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
@@ -34,6 +48,7 @@ function App() {
   const groupMap = new Map(groups.map((g) => [g.id, g]))
 
   const handleDragStart = (event: DragStartEvent) => {
+    if (linkType) cancelLink()
     const guestId = parseGuestDragId(String(event.active.id))
     if (guestId) setActiveGuestId(guestId)
   }
@@ -72,6 +87,8 @@ function App() {
       </div>
 
       <ExportView ref={exportViewRef} />
+      <GuideModal />
+      <Toast />
 
       <DragOverlay dropAnimation={null}>
         {activeGuest ? (

@@ -12,7 +12,7 @@ import type {
 } from '../types'
 import { GROUP_COLORS } from '../types'
 import { createId } from '../lib/utils'
-import { createSeedState } from './seedData'
+import { createEmptyState, createSeedState } from './seedData'
 
 interface SeatingStore extends SeatingPlanState {
   // Project
@@ -48,7 +48,8 @@ interface SeatingStore extends SeatingPlanState {
 
   // Import / reset
   importState: (state: SeatingPlanState) => void
-  resetToSeed: () => void
+  loadDemo: () => void
+  clearAll: () => void
 }
 
 function removeGuestFromConstraints(constraints: Constraints, guestId: string): Constraints {
@@ -70,7 +71,7 @@ function getNextTablePosition(tables: Table[]): { x: number; y: number } {
 export const useSeatingStore = create<SeatingStore>()(
   persist(
     (set) => ({
-      ...createSeedState(),
+      ...createEmptyState(),
 
       setProjectName: (name) => set({ projectName: name }),
 
@@ -248,11 +249,14 @@ export const useSeatingStore = create<SeatingStore>()(
 
       importState: (state) => set({ ...state }),
 
-      resetToSeed: () => set(createSeedState()),
+      loadDemo: () => set(createSeedState()),
+
+      clearAll: () => set(createEmptyState()),
     }),
     {
       name: 'seatfinder-storage',
-      version: 1,
+      version: 2,
+      migrate: () => createEmptyState(),
     },
   ),
 )

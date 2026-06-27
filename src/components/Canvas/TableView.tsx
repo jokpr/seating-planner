@@ -21,12 +21,14 @@ export function TableView({
   onToggleLock,
 }: TableViewProps) {
   const seats = getSeatPositions(table)
-  const dims = getTableDimensions(table.shape)
+  const dims = getTableDimensions(table)
   const groupMap = new Map(groups.map((g) => [g.id, g]))
   const hasTableConflict = conflictTableIds.has(table.id)
 
   const seatedGuests = guests.filter((g) => g.seat?.tableId === table.id)
   const guestBySeat = new Map(seatedGuests.map((g) => [g.seat!.seatIndex, g]))
+
+  const roundSize = Math.min(dims.width, dims.height) * 0.52
 
   return (
     <div
@@ -47,20 +49,24 @@ export function TableView({
 
       <div
         className={cn(
-          'relative mx-auto rounded-2xl border-2 bg-white/80 shadow-sm backdrop-blur-sm transition-colors',
-          hasTableConflict ? 'border-red-300' : 'border-border',
-          table.shape === 'head' ? 'h-20' : 'h-[200px]',
+          'relative mx-auto rounded-2xl transition-colors',
+          hasTableConflict && 'rounded-2xl',
         )}
-        style={{ width: dims.width }}
+        style={{ width: dims.width, height: dims.height }}
       >
         {/* Table surface */}
         <div
           className={cn(
-            'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 border border-border/40 bg-cream/60',
-            table.shape === 'round' && 'h-24 w-24 rounded-full',
-            table.shape === 'rectangular' && 'h-16 w-36 rounded-lg',
-            table.shape === 'head' && 'h-10 w-full rounded-md',
+            'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 border-2 bg-white/80 shadow-sm backdrop-blur-sm',
+            hasTableConflict ? 'border-red-300' : 'border-border',
           )}
+          style={
+            table.shape === 'round'
+              ? { width: roundSize, height: roundSize, borderRadius: '9999px' }
+              : table.shape === 'rectangular'
+                ? { width: dims.width - 120, height: dims.height - 120, borderRadius: 16 }
+                : { width: dims.width - 80, height: 48, borderRadius: 12 }
+          }
         />
 
         {seats.map((seat) => {

@@ -1,6 +1,44 @@
 import type { SeatPosition, Table, TableShape } from '../../types'
 
-const CANVAS_SIZE = 200
+// A seated name chip is up to ~92px wide, so seats need >= ~100px of
+// horizontal breathing room and a half-chip of padding at the edges.
+const CHIP_HALF = 48
+const H_SPACING = 104
+const EDGE_PAD = 56
+
+export interface TableDimensions {
+  width: number
+  height: number
+}
+
+export function getTableDimensions(table: Table): TableDimensions {
+  return dims(table.shape, table.capacity)
+}
+
+function dims(shape: TableShape, capacity: number): TableDimensions {
+  switch (shape) {
+    case 'round': {
+      const radius = roundRadius(capacity)
+      const size = Math.ceil(radius * 2 + CHIP_HALF * 2 + 16)
+      return { width: size, height: size }
+    }
+    case 'rectangular': {
+      const perRow = Math.ceil(capacity / 2)
+      const width = Math.max(280, EDGE_PAD * 2 + Math.max(perRow - 1, 0) * H_SPACING)
+      return { width, height: 236 }
+    }
+    case 'head':
+    default: {
+      const width = Math.max(240, EDGE_PAD * 2 + Math.max(capacity - 1, 0) * H_SPACING)
+      return { width, height: 132 }
+    }
+  }
+}
+
+function roundRadius(capacity: number): number {
+  // Keep arc distance between neighbours ~= H_SPACING.
+  return Math.max(86, Math.round((capacity * H_SPACING) / (2 * Math.PI)))
+}
 
 export function getSeatPositions(table: Table): SeatPosition[] {
   switch (table.shape) {
@@ -16,14 +54,16 @@ export function getSeatPositions(table: Table): SeatPosition[] {
 }
 
 function getRoundSeats(capacity: number): SeatPosition[] {
-  const radius = CANVAS_SIZE / 2 - 20
-  const center = CANVAS_SIZE / 2
+  const radius = roundRadius(capacity)
+  const { width, height } = dims('round', capacity)
+  const cx = width / 2
+  const cy = height / 2
   return Array.from({ length: capacity }, (_, i) => {
     const angle = (2 * Math.PI * i) / capacity - Math.PI / 2
     return {
       seatIndex: i,
-      x: center + radius * Math.cos(angle),
-      y: center + radius * Math.sin(angle),
+      x: cx + radius * Math.cos(angle),
+      y: cy + radius * Math.sin(angle),
     }
   })
 }
@@ -31,36 +71,33 @@ function getRoundSeats(capacity: number): SeatPosition[] {
 function getRectangularSeats(capacity: number): SeatPosition[] {
   const topCount = Math.ceil(capacity / 2)
   const bottomCount = capacity - topCount
-  const padding = 24
-  const width = CANVAS_SIZE - padding * 2
+  const { width, height } = dims('rectangular', capacity)
   const positions: SeatPosition[] = []
 
-  for (let i = 0; i < topCount; i++) {
-    const x =
-      topCount === 1
-        ? CANVAS_SIZE / 2
-        : padding + (width * i) / Math.max(topCount - 1, 1)
-    positions.push({ seatIndex: i, x, y: 18 })
+  const place = (count: number, startIndex: number, y: number) => {
+    for (let i = 0; i < count; i++) {
+      const x =
+        count === 1
+          ? width / 2
+          : EDGE_PAD + ((width - EDGE_PAD * 2) * i) / Math.max(count - 1, 1)
+      positions.push({ seatIndex: startIndex + i, x, y })
+    }
   }
 
-  for (let i = 0; i < bottomCount; i++) {
-    const x =
-      bottomCount === 1
-        ? CANVAS_SIZE / 2
-        : padding + (width * i) / Math.max(bottomCount - 1, 1)
-    positions.push({ seatIndex: topCount + i, x, y: CANVAS_SIZE - 18 })
-  }
-
+  place(topCount, 0, 40)
+  place(bottomCount, topCount, height - 40)
   return positions
 }
 
 function getHeadSeats(capacity: number): SeatPosition[] {
-  const padding = 24
-  const width = CANVAS_SIZE - padding * 2
+  const { width, height } = dims('head', capacity)
   return Array.from({ length: capacity }, (_, i) => ({
     seatIndex: i,
-    x: padding + (width * i) / Math.max(capacity - 1, 1),
-    y: CANVAS_SIZE / 2,
+    x:
+      capacity === 1
+        ? width / 2
+        : EDGE_PAD + ((width - EDGE_PAD * 2) * i) / Math.max(capacity - 1, 1),
+    y: height / 2,
   }))
 }
 
@@ -119,12 +156,3 @@ function getHeadAdjacency(capacity: number): Map<number, number[]> {
   }
   return map
 }
-
-export function getTableDimensions(shape: TableShape): { width: number; height: number } {
-  if (shape === 'head') {
-    return { width: CANVAS_SIZE, height: 80 }
-  }
-  return { width: CANVAS_SIZE, height: CANVAS_SIZE }
-}
-
-export { CANVAS_SIZE }
