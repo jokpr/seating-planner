@@ -5,7 +5,7 @@ import { useSeatingStore } from '../../store/useSeatingStore'
 import { useUiStore, RULE_META } from '../../store/useUiStore'
 import { useGuestConflictIds, useTableConflictIds } from '../../hooks/useConflicts'
 import { useIsMobile } from '../../hooks/useMediaQuery'
-import { getTableDimensions } from '../../lib/seating/layout'
+import { getTableLayoutBounds } from '../../lib/seating/layout'
 import { CANVAS_DROP_ID } from '../../lib/dnd/types'
 import { cn } from '../../lib/utils'
 import { CanvasToolbar, CanvasGuestDock } from './CanvasToolbar'
@@ -48,7 +48,7 @@ export function TablesCanvas() {
 
   const bounds = tables.reduce(
     (acc, t) => {
-      const d = getTableDimensions(t)
+      const d = getTableLayoutBounds(t)
       return {
         w: Math.max(acc.w, t.x + d.width + 120),
         h: Math.max(acc.h, t.y + d.height + 200),
@@ -105,6 +105,12 @@ export function TablesCanvas() {
     }
   }, [])
 
+  const handleCanvasPointerDownCapture = useCallback((e: React.PointerEvent) => {
+    const target = e.target as HTMLElement
+    if (target.closest('[data-table-select], [data-table-controls]')) return
+    setSelectedTableId(null)
+  }, [setSelectedTableId])
+
   const handleBackgroundClick = useCallback((e: React.MouseEvent) => {
     if ((e.target as HTMLElement).closest('[data-no-pan]')) return
     if (suppressBackgroundClick.current) {
@@ -124,7 +130,12 @@ export function TablesCanvas() {
         onPointerUp={handlePanPointerUp}
         onPointerCancel={handlePanPointerUp}
       >
-        <CanvasWorld bounds={bounds} pan={canvasPan} onBackgroundClick={handleBackgroundClick}>
+        <CanvasWorld
+          bounds={bounds}
+          pan={canvasPan}
+          onBackgroundClick={handleBackgroundClick}
+          onPointerDownCapture={handleCanvasPointerDownCapture}
+        >
           {showOnboarding ? (
             <div className="flex h-full min-h-[280px] items-center justify-center px-4 md:min-h-[560px]">
               <div
@@ -227,11 +238,13 @@ function CanvasWorld({
   pan,
   children,
   onBackgroundClick,
+  onPointerDownCapture,
 }: {
   bounds: { w: number; h: number }
   pan: { x: number; y: number }
   children: React.ReactNode
   onBackgroundClick: (e: React.MouseEvent) => void
+  onPointerDownCapture: (e: React.PointerEvent) => void
 }) {
   const { setNodeRef, isOver } = useDroppable({
     id: CANVAS_DROP_ID,
@@ -249,6 +262,7 @@ function CanvasWorld({
         transform: `translate(${pan.x}px, ${pan.y}px)`,
       }}
       onClick={onBackgroundClick}
+      onPointerDownCapture={onPointerDownCapture}
     >
       {children}
     </div>

@@ -1,6 +1,6 @@
 import { forwardRef } from 'react'
 import { useSeatingStore } from '../store/useSeatingStore'
-import { getTableDimensions } from '../lib/seating/layout'
+import { getTableLayoutBounds } from '../lib/seating/layout'
 import { TableViewStatic } from './Canvas/TableView'
 
 export const ExportView = forwardRef<HTMLDivElement>(function ExportView(_, ref) {
@@ -11,7 +11,7 @@ export const ExportView = forwardRef<HTMLDivElement>(function ExportView(_, ref)
 
   const bounds = tables.reduce(
     (acc, t) => {
-      const d = getTableDimensions(t)
+      const d = getTableLayoutBounds(t)
       return {
         w: Math.max(acc.w, t.x + d.width + 80),
         h: Math.max(acc.h, t.y + d.height + 100),

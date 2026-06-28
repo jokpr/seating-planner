@@ -10,9 +10,9 @@ export function createEmptyState(): SeatingPlanState {
     projectName: 'Paulina & Marius',
     groups: [],
     tables: [
-      { id: headTable, name: 'Head Table', shape: 'head', capacity: 4, x: 60, y: 40 },
-      { id: createId(), name: 'Table 1', shape: 'round', capacity: 8, x: 60, y: 260 },
-      { id: createId(), name: 'Table 2', shape: 'round', capacity: 8, x: 420, y: 260 },
+      { id: headTable, name: 'Head Table', shape: 'head', capacity: 4, x: 60, y: 40, rotation: 0 },
+      { id: createId(), name: 'Table 1', shape: 'round', capacity: 8, x: 60, y: 260, rotation: 0 },
+      { id: createId(), name: 'Table 2', shape: 'round', capacity: 8, x: 420, y: 260, rotation: 0 },
     ],
     guests: [
       { id: createId(), name: 'Paulina', locked: false, seat: { tableId: headTable, seatIndex: 0 } },
@@ -69,10 +69,10 @@ export function createSeedState(): SeatingPlanState {
       { id: work, name: 'Work Colleagues', color: GROUP_COLORS[3] },
     ],
     tables: [
-      { id: headTable, name: 'Head Table', shape: 'head', capacity: 6, x: 80, y: 40 },
-      { id: table1, name: 'Table 1', shape: 'round', capacity: 8, x: 60, y: 280 },
-      { id: table2, name: 'Table 2', shape: 'round', capacity: 8, x: 420, y: 280 },
-      { id: table3, name: 'Table 3', shape: 'rectangular', capacity: 10, x: 780, y: 280 },
+      { id: headTable, name: 'Head Table', shape: 'head', capacity: 6, x: 80, y: 40, rotation: 0 },
+      { id: table1, name: 'Table 1', shape: 'round', capacity: 8, x: 60, y: 280, rotation: 0 },
+      { id: table2, name: 'Table 2', shape: 'round', capacity: 8, x: 420, y: 280, rotation: 0 },
+      { id: table3, name: 'Table 3', shape: 'rectangular', capacity: 10, x: 780, y: 280, rotation: 0 },
     ],
     guests,
     constraints: {

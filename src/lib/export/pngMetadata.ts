@@ -1,4 +1,4 @@
-import type { SeatingPlanState } from '../../types'
+import type { SeatingPlanState, Table } from '../../types'
 
 const KEYWORD = 'seatfinder'
 const KEYWORD_BYTES = new TextEncoder().encode(KEYWORD)
@@ -131,7 +131,7 @@ export function parsePlan(json: string): SeatingPlanState {
     projectName: parsed.projectName ?? 'Untitled',
     guests: parsed.guests,
     groups: parsed.groups ?? [],
-    tables: parsed.tables,
+    tables: (parsed.tables as Table[]).map((t) => ({ ...t, rotation: t.rotation ?? 0 })),
     constraints: parsed.constraints ?? {
       sameTableBlacklist: [],
       adjacencyBlacklist: [],

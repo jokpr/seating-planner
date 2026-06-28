@@ -57,7 +57,6 @@ function App() {
   const exportViewRef = useRef<HTMLDivElement>(null)
 
   const [activeGuestId, setActiveGuestId] = useState<string | null>(null)
-  const [activeTableId, setActiveTableId] = useState<string | null>(null)
   const [activeTemplate, setActiveTemplate] = useState<{
     shape: TableShape
     capacity: number
@@ -86,18 +85,12 @@ function App() {
       setActiveGuestId(guestId)
       return
     }
-    const tableId = parseTableDragId(String(event.active.id))
-    if (tableId) {
-      setActiveTableId(tableId)
-      return
-    }
     const template = parseTableTemplateDragId(String(event.active.id))
     if (template) setActiveTemplate(template)
   }
 
   const handleDragEnd = (event: DragEndEvent) => {
     setActiveGuestId(null)
-    setActiveTableId(null)
     setActiveTemplate(null)
 
     const activeId = String(event.active.id)
@@ -140,7 +133,6 @@ function App() {
   }
 
   const activeGuest = activeGuestId ? guests.find((g) => g.id === activeGuestId) : null
-  const activeTable = activeTableId ? tables.find((t) => t.id === activeTableId) : null
 
   return (
     <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
@@ -169,10 +161,6 @@ function App() {
             guest={activeGuest}
             group={activeGuest.groupId ? groupMap.get(activeGuest.groupId) : undefined}
           />
-        ) : activeTable ? (
-          <div className="rounded-xl border border-rose/30 bg-surface/35 px-3 py-1.5 text-sm font-semibold shadow-md backdrop-blur-md">
-            {activeTable.name}
-          </div>
         ) : activeTemplate ? (
           <div className="flex items-center gap-2 rounded-xl border border-rose/30 bg-surface/35 px-3 py-1.5 text-sm font-medium shadow-md backdrop-blur-md">
             <TemplateIcon shape={activeTemplate.shape} />

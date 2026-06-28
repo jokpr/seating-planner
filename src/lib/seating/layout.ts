@@ -2,7 +2,11 @@ import type { SeatPosition, Table, TableShape } from '../../types'
 
 // A seated name chip is up to ~92px wide, so seats need >= ~100px of
 // horizontal breathing room and a half-chip of padding at the edges.
+// Guest chip (~30px) + seat number below, centered on the seat point.
+const GUEST_LABEL_HALF_HEIGHT = 24
+const LABEL_GAP_ABOVE_GUESTS = 12
 const CHIP_HALF = 48
+
 const H_SPACING = 104
 const EDGE_PAD = 56
 
@@ -11,8 +15,44 @@ export interface TableDimensions {
   height: number
 }
 
-export function getTableDimensions(table: Table): TableDimensions {
+export function normalizeRotation(degrees: number): number {
+  return ((degrees % 360) + 360) % 360
+}
+
+export function getTableRotation(table: Table): number {
+  return normalizeRotation(table.rotation ?? 0)
+}
+
+/** 0° = top, clockwise. Screen coordinates (y grows downward). */
+export function angleFromCenterDeg(cx: number, cy: number, px: number, py: number): number {
+  return normalizeRotation(pointerAngleDeg(cx, cy, px, py))
+}
+
+function pointerAngleDeg(cx: number, cy: number, px: number, py: number): number {
+  return (Math.atan2(px - cx, -(py - cy)) * 180) / Math.PI
+}
+
+export function snapRotation(degrees: number, increment = 15): number {
+  return normalizeRotation(Math.round(degrees / increment) * increment)
+}
+
+export function getUnrotatedTableDimensions(table: Table): TableDimensions {
   return dims(table.shape, table.capacity)
+}
+
+/**
+ * Fixed layout box — size stays constant while rotating so the table never jumps.
+ */
+export function getTableLayoutBounds(table: Table): TableDimensions {
+  const base = getUnrotatedTableDimensions(table)
+  if (table.shape === 'round') return base
+  const size = Math.ceil(Math.hypot(base.width, base.height))
+  return { width: size, height: size }
+}
+
+/** @deprecated Use getTableLayoutBounds — kept for call-site clarity. */
+export function getTableDimensions(table: Table): TableDimensions {
+  return getTableLayoutBounds(table)
 }
 
 function dims(shape: TableShape, capacity: number): TableDimensions {
@@ -51,6 +91,35 @@ export function getSeatPositions(table: Table): SeatPosition[] {
     default:
       return getRoundSeats(table.capacity)
   }
+}
+
+/**
+ * Y position (pivot coords) for the bottom edge of the table name / controls stack,
+ * placed above the northernmost guest label even when the table is rotated.
+ */
+export function getTableLabelAnchorTop(
+  table: Table,
+  seats: SeatPosition[],
+  layoutBounds: TableDimensions,
+  bodyDims: TableDimensions,
+): number {
+  const pivotCy = layoutBounds.height / 2
+  const bodyCx = bodyDims.width / 2
+  const bodyCy = bodyDims.height / 2
+  const rotationRad = (getTableRotation(table) * Math.PI) / 180
+  const cos = Math.cos(rotationRad)
+  const sin = Math.sin(rotationRad)
+
+  let northernLabelTop = pivotCy
+
+  for (const seat of seats) {
+    const dx = seat.x - bodyCx
+    const dy = seat.y - bodyCy
+    const seatY = pivotCy + (-dx * sin + dy * cos)
+    northernLabelTop = Math.min(northernLabelTop, seatY - GUEST_LABEL_HALF_HEIGHT)
+  }
+
+  return Math.max(4, northernLabelTop - LABEL_GAP_ABOVE_GUESTS)
 }
 
 function getRoundSeats(capacity: number): SeatPosition[] {

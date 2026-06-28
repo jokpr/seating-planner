@@ -26,6 +26,8 @@ export interface Table {
   capacity: number
   x: number
   y: number
+  /** Clockwise rotation in degrees (0–359). */
+  rotation: number
 }
 
 export interface GuestPair {

@@ -11,6 +11,7 @@ import type {
   Weights,
 } from '../types'
 import { GROUP_COLORS } from '../types'
+import { normalizeRotation } from '../lib/seating/layout'
 import { createId } from '../lib/utils'
 import { createEmptyState, createSeedState } from './seedData'
 
@@ -39,6 +40,7 @@ interface SeatingStore extends SeatingPlanState {
   updateTable: (id: string, updates: Partial<Omit<Table, 'id'>>) => void
   removeTable: (id: string) => void
   moveTable: (id: string, x: number, y: number) => void
+  setTableRotation: (id: string, rotation: number) => void
 
   // Constraints
   addConstraint: (type: keyof Constraints, pair: GuestPair) => void
@@ -201,7 +203,7 @@ export const useSeatingStore = create<SeatingStore>()(
           return {
             tables: [
               ...s.tables,
-              { id: createId(), name, shape, capacity, x: pos.x, y: pos.y },
+              { id: createId(), name, shape, capacity, x: pos.x, y: pos.y, rotation: 0 },
             ],
           }
         }),
@@ -217,6 +219,7 @@ export const useSeatingStore = create<SeatingStore>()(
               capacity,
               x: Math.max(0, Math.round(x)),
               y: Math.max(0, Math.round(y)),
+              rotation: 0,
             },
           ],
         })),
@@ -240,6 +243,13 @@ export const useSeatingStore = create<SeatingStore>()(
             t.id === id
               ? { ...t, x: Math.max(0, Math.round(x)), y: Math.max(0, Math.round(y)) }
               : t,
+          ),
+        })),
+
+      setTableRotation: (id, rotation) =>
+        set((s) => ({
+          tables: s.tables.map((t) =>
+            t.id === id ? { ...t, rotation: normalizeRotation(rotation) } : t,
           ),
         })),
 
@@ -278,8 +288,17 @@ export const useSeatingStore = create<SeatingStore>()(
     }),
     {
       name: 'seatfinder-storage',
-      version: 2,
-      migrate: () => createEmptyState(),
+      version: 3,
+      migrate: (persistedState, version) => {
+        const state = persistedState as SeatingStore
+        if (version < 3) {
+          return {
+            ...state,
+            tables: state.tables?.map((t) => ({ ...t, rotation: t.rotation ?? 0 })) ?? [],
+          }
+        }
+        return state
+      },
     },
   ),
 )

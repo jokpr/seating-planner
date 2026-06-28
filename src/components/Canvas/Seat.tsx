@@ -14,6 +14,8 @@ interface SeatProps {
   seatIndex: number
   x: number
   y: number
+  /** Counter-rotation so labels stay upright when the table is rotated. */
+  uprightRotation?: number
   guest?: Guest
   group?: Group
   hasConflict?: boolean
@@ -25,6 +27,7 @@ export function Seat({
   seatIndex,
   x,
   y,
+  uprightRotation = 0,
   guest,
   group,
   hasConflict,
@@ -41,6 +44,7 @@ export function Seat({
   const openMenu = useUiStore((s) => s.openMenu)
   const cancelLink = useUiStore((s) => s.cancelLink)
   const showToast = useUiStore((s) => s.showToast)
+  const setSelectedTableId = useUiStore((s) => s.setSelectedTableId)
   const addConstraint = useSeatingStore((s) => s.addConstraint)
   const isMobile = useIsMobile()
   const anchorRef = useRef<HTMLDivElement>(null)
@@ -50,8 +54,11 @@ export function Seat({
   const isPickable = isLinking && !!guest && guest.id !== linkSourceId
   const isMenuOpen = menuGuestId === guest?.id && !isLinking
 
+  const deselectTable = () => setSelectedTableId(null)
+
   const handleGuestClick = () => {
     if (!guest) return
+    deselectTable()
     if (isLinking && linkType) {
       if (guest.id === linkSourceId) {
         cancelLink()
@@ -78,13 +85,17 @@ export function Seat({
       ref={setNodeRef}
       data-no-pan
       className={cn(
-        'absolute -translate-x-1/2 -translate-y-1/2',
+        'absolute',
         isMenuOpen ? 'z-50' : 'z-0',
       )}
-      style={{ left: x, top: y }}
+      style={{
+        left: x,
+        top: y,
+        transform: `translate(-50%, -50%)${uprightRotation ? ` rotate(${-uprightRotation}deg)` : ''}`,
+      }}
     >
       {guest ? (
-        <div ref={anchorRef} className="relative">
+        <div ref={anchorRef} className="relative flex flex-col items-center gap-0.5">
           <GuestChip
             guest={guest}
             group={group}
@@ -96,6 +107,7 @@ export function Seat({
             pickable={isPickable}
             touchFriendly={isMobile}
           />
+          <span className="text-[9px] font-medium tabular-nums text-muted">{seatIndex + 1}</span>
           {isMenuOpen && <GuestSeatMenu guest={guest} anchorRef={anchorRef} />}
         </div>
       ) : (
@@ -106,6 +118,10 @@ export function Seat({
               ? 'scale-110 border-rose bg-rose/20'
               : 'border-border/60 bg-surface/50 hover:border-rose/50',
           )}
+          onClick={(e) => {
+            e.stopPropagation()
+            deselectTable()
+          }}
         >
           <span className="text-[10px] text-muted">{seatIndex + 1}</span>
         </div>
