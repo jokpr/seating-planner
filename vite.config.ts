@@ -4,11 +4,13 @@ import tailwindcss from '@tailwindcss/vite'
 import { writeFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
+import { cloudflare } from "@cloudflare/vite-plugin";
+
 const DEFAULT_SITE_URL = 'https://seat-planner.com'
 
 function siteUrlFromEnv(mode: string) {
   const env = loadEnv(mode, process.cwd(), '')
-  return (env.VITE_SITE_URL || DEFAULT_SITE_URL).replace(/\/$/, '')
+  return (env.VITE_SITE_URL || DEFAULT_SITE_URL).replace(/\/$/, '');
 }
 
 function seoTransformPlugin(mode: string) {
@@ -51,5 +53,5 @@ ${legalPaths
 }
 
 export default defineConfig(({ mode }) => ({
-  plugins: [react(), tailwindcss(), seoTransformPlugin(mode)],
+  plugins: [react(), tailwindcss(), seoTransformPlugin(mode), cloudflare()],
 }))
