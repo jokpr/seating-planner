@@ -1,8 +1,8 @@
 import { useRef } from 'react'
-import { useDroppable } from '@dnd-kit/core'
+import { useDndContext, useDroppable } from '@dnd-kit/core'
 import type { Guest, Group } from '../../types'
 import { cn } from '../../lib/utils'
-import { seatDropId } from '../../lib/dnd/types'
+import { parseGuestDragId, seatDropId } from '../../lib/dnd/types'
 import { useSeatingStore } from '../../store/useSeatingStore'
 import { RULE_META, useUiStore } from '../../store/useUiStore'
 import { useIsMobile } from '../../hooks/useMediaQuery'
@@ -37,6 +37,10 @@ export function Seat({
     id: seatDropId(tableId, seatIndex),
     data: { type: 'seat', tableId, seatIndex },
   })
+
+  const { active } = useDndContext()
+  const isGuestDrag = active ? !!parseGuestDragId(String(active.id)) : false
+  const showDropTarget = isGuestDrag && !guest
 
   const menuGuestId = useUiStore((s) => s.menuGuestId)
   const linkSourceId = useUiStore((s) => s.linkSourceId)
@@ -82,10 +86,8 @@ export function Seat({
 
   return (
     <div
-      ref={setNodeRef}
-      data-no-pan
       className={cn(
-        'absolute',
+        'pointer-events-none absolute',
         isMenuOpen ? 'z-50' : 'z-0',
       )}
       style={{
@@ -94,38 +96,55 @@ export function Seat({
         transform: `translate(-50%, -50%)${uprightRotation ? ` rotate(${-uprightRotation}deg)` : ''}`,
       }}
     >
-      {guest ? (
-        <div ref={anchorRef} className="relative flex flex-col items-center gap-0.5">
-          <GuestChip
-            guest={guest}
-            group={group}
-            hasConflict={hasConflict}
-            compact
-            onToggleLock={onToggleLock}
-            onClick={handleGuestClick}
-            selected={isLinkSource}
-            pickable={isPickable}
-            touchFriendly={isMobile}
-          />
-          <span className="text-[9px] font-medium tabular-nums text-muted">{seatIndex + 1}</span>
-          {isMenuOpen && <GuestSeatMenu guest={guest} anchorRef={anchorRef} />}
-        </div>
-      ) : (
-        <div
-          className={cn(
-            'flex h-8 w-8 items-center justify-center rounded-full border-2 border-dashed transition-colors',
-            isOver
-              ? 'scale-110 border-rose bg-rose/20'
-              : 'border-border/60 bg-surface/50 hover:border-rose/50',
-          )}
-          onClick={(e) => {
-            e.stopPropagation()
-            deselectTable()
-          }}
-        >
-          <span className="text-[10px] text-muted">{seatIndex + 1}</span>
-        </div>
-      )}
+      <div
+        ref={setNodeRef}
+        data-no-pan
+        data-seat-interactive
+        className="pointer-events-auto flex items-center justify-center transition-transform duration-150"
+      >
+        {guest ? (
+          <div
+            ref={anchorRef}
+            className={cn(
+              'relative flex flex-col items-center gap-0.5 transition-transform duration-150',
+              isOver && isGuestDrag && 'scale-105',
+            )}
+          >
+            <GuestChip
+              guest={guest}
+              group={group}
+              hasConflict={hasConflict}
+              compact
+              onToggleLock={onToggleLock}
+              onClick={handleGuestClick}
+              selected={isLinkSource}
+              pickable={isPickable}
+              touchFriendly={isMobile}
+            />
+            <span className="text-[9px] font-medium tabular-nums text-muted">{seatIndex + 1}</span>
+            {isMenuOpen && <GuestSeatMenu guest={guest} anchorRef={anchorRef} />}
+          </div>
+        ) : (
+          <div
+            className={cn(
+              'flex h-8 w-8 items-center justify-center rounded-full border-2 border-dashed transition-all duration-150',
+              isOver
+                ? 'scale-125 border-rose bg-rose/25 shadow-md shadow-rose/20 ring-4 ring-rose/30'
+                : showDropTarget
+                  ? 'scale-105 border-rose/40 bg-rose/5'
+                  : 'border-border/60 bg-surface/50 hover:border-rose/50',
+            )}
+            onClick={(e) => {
+              e.stopPropagation()
+              deselectTable()
+            }}
+          >
+            <span className={cn('text-[10px] text-muted', isOver && 'font-semibold text-rose-dark')}>
+              {seatIndex + 1}
+            </span>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

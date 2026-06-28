@@ -10,20 +10,24 @@
 
 @theme {
   --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --color-cream: #faf8f5;
-  --color-ink: #1a1a2e;
-  --color-rose: #e8a0bf;
-  --color-rose-dark: #c77d9e;
-  --color-sage: #8fa68f;
-  --color-gold: #c9a962;
+  --color-cream: #f7f5fc;
+  --color-ink: #1a1730;
+  --color-rose: #9775fa;
+  --color-rose-dark: #7c3aed;
+  --color-sage: #6d9b8a;
+  --color-gold: #c4a35a;
   --color-surface: #ffffff;
-  --color-muted: #6b7280;
-  --color-border: #e8e4df;
+  --color-muted: #6b6580;
+  --color-border: #e4e0f0;
 }
 
 html.dark {
   --color-cream: #12121a;
   --color-ink: #e8e6e3;
+  --color-rose: #e8a0bf;
+  --color-rose-dark: #c77d9e;
+  --color-sage: #8fa68f;
+  --color-gold: #c9a962;
   --color-surface: #1e1e2e;
   --color-muted: #9ca3af;
   --color-border: #2d2d3d;
@@ -47,6 +51,13 @@ html.dark {
     touch-action: manipulation;
   }
 
+  html:not(.dark) body {
+    background:
+      radial-gradient(ellipse 80% 60% at 10% 0%, rgba(151, 117, 250, 0.12) 0%, transparent 55%),
+      radial-gradient(ellipse 70% 50% at 95% 100%, rgba(236, 72, 153, 0.08) 0%, transparent 50%),
+      linear-gradient(165deg, #f8f6ff 0%, #f7f5fc 45%, #faf8ff 100%);
+  }
+
   * {
     box-sizing: border-box;
   }
@@ -67,22 +78,48 @@ html.dark {
 
   .scrollbar-thin {
     scrollbar-width: thin;
-    scrollbar-color: #d1d5db transparent;
+    scrollbar-color: #c4bdd8 transparent;
   }
 
   html.dark .scrollbar-thin {
     scrollbar-color: #4b5563 transparent;
   }
 
+  .accent-gradient-bg {
+    background-image: linear-gradient(135deg, #7c3aed 0%, #a855f7 38%, #ec4899 72%, #f97316 100%);
+  }
+
+  html.dark .accent-gradient-bg {
+    background-image: linear-gradient(135deg, var(--color-rose-dark), var(--color-rose));
+  }
+
+  .accent-gradient-icon {
+    background-image: linear-gradient(135deg, #7c3aed, #c026d3, #f97316);
+  }
+
+  html.dark .accent-gradient-icon {
+    background-image: linear-gradient(135deg, var(--color-rose-dark), var(--color-rose));
+  }
+
   .canvas-floor {
+    --canvas-pan-x: 0px;
+    --canvas-pan-y: 0px;
     background-color: var(--color-cream);
     background-image:
-      radial-gradient(circle at 20% 20%, rgba(232, 160, 191, 0.08) 0%, transparent 50%),
-      radial-gradient(circle at 80% 80%, rgba(143, 166, 143, 0.08) 0%, transparent 50%),
-      linear-gradient(to right, rgba(232, 228, 223, 0.55) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(232, 228, 223, 0.55) 1px, transparent 1px),
-      linear-gradient(145deg, #faf8f5 0%, #f5f0ea 50%, #faf8f5 100%);
-    background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px, 100% 100%;
+      radial-gradient(circle at 12% 18%, rgba(151, 117, 250, 0.14) 0%, transparent 48%),
+      radial-gradient(circle at 88% 82%, rgba(236, 72, 153, 0.1) 0%, transparent 48%),
+      radial-gradient(circle at 72% 12%, rgba(59, 130, 246, 0.07) 0%, transparent 42%),
+      linear-gradient(to right, rgba(212, 206, 232, 0.55) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(212, 206, 232, 0.55) 1px, transparent 1px),
+      linear-gradient(145deg, #f9f7ff 0%, #f3f0fa 50%, #faf8ff 100%);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 40px 40px, 40px 40px, 100% 100%;
+    background-position:
+      0 0,
+      0 0,
+      0 0,
+      var(--canvas-pan-x) var(--canvas-pan-y),
+      var(--canvas-pan-x) var(--canvas-pan-y),
+      0 0;
   }
 
   html.dark .canvas-floor {
@@ -92,6 +129,21 @@ html.dark {
       linear-gradient(to right, rgba(45, 45, 61, 0.5) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(45, 45, 61, 0.5) 1px, transparent 1px),
       linear-gradient(145deg, #12121a 0%, #16161f 50%, #12121a 100%);
+    background-size: 100% 100%, 100% 100%, 40px 40px, 40px 40px, 100% 100%;
+    background-position:
+      0 0,
+      0 0,
+      var(--canvas-pan-x) var(--canvas-pan-y),
+      var(--canvas-pan-x) var(--canvas-pan-y),
+      0 0;
+  }
+
+  html:not(.dark) .glass-surface {
+    background: rgba(255, 255, 255, 0.72);
+    border-color: rgba(212, 206, 232, 0.65);
+    box-shadow:
+      0 1px 2px rgba(26, 23, 48, 0.04),
+      0 8px 24px rgba(124, 58, 237, 0.06);
   }
 
   .canvas-viewport {

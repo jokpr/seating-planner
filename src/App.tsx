@@ -4,10 +4,12 @@ import {
   DragOverlay,
   PointerSensor,
   TouchSensor,
+  defaultDropAnimationSideEffects,
   useSensor,
   useSensors,
   type DragEndEvent,
   type DragStartEvent,
+  type DropAnimation,
 } from '@dnd-kit/core'
 import { Circle, LayoutGrid, Minus } from 'lucide-react'
 import { Sidebar } from './components/Sidebar/Sidebar'
@@ -27,18 +29,31 @@ import {
   parseTableDragId,
   parseTableTemplateDragId,
 } from './lib/dnd/types'
+import { seatingCollisionDetection } from './lib/dnd/collision'
 import type { TableShape } from './types'
 
 const GUIDE_SEEN_KEY = 'seatfinder-guide-seen'
+
+const guestDropAnimation: DropAnimation = {
+  duration: 220,
+  easing: 'cubic-bezier(0.18, 0.67, 0.35, 1.1)',
+  sideEffects: defaultDropAnimationSideEffects({
+    styles: {
+      active: { opacity: '0.5' },
+    },
+  }),
+}
 
 function getDropCoordsOnCanvas(event: DragEndEvent): { x: number; y: number } {
   const world = document.querySelector('[data-canvas-world]') as HTMLElement | null
   const rect = event.active.rect.current.translated
   if (!world || !rect) return { x: 120, y: 120 }
   const worldRect = world.getBoundingClientRect()
-  const x = rect.left + rect.width / 2 - worldRect.left - 60
-  const y = rect.top + rect.height / 2 - worldRect.top - 40
-  return { x: Math.max(20, x), y: Math.max(20, y) }
+  const offsetX = Number(world.dataset.offsetX ?? 0)
+  const offsetY = Number(world.dataset.offsetY ?? 0)
+  const x = rect.left + rect.width / 2 - worldRect.left - offsetX - 60
+  const y = rect.top + rect.height / 2 - worldRect.top - offsetY - 40
+  return { x, y }
 }
 
 function App() {
@@ -135,7 +150,12 @@ function App() {
   const activeGuest = activeGuestId ? guests.find((g) => g.id === activeGuestId) : null
 
   return (
-    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={seatingCollisionDetection}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
       <div className="flex h-full flex-col">
         <TopBar exportViewRef={exportViewRef} />
         <div className="flex flex-1 overflow-hidden pb-[calc(4.5rem+env(safe-area-inset-bottom))] md:pb-0">
@@ -155,11 +175,12 @@ function App() {
       <GuideModal />
       <Toast />
 
-      <DragOverlay dropAnimation={null}>
+      <DragOverlay dropAnimation={activeGuest ? guestDropAnimation : null}>
         {activeGuest ? (
           <GuestChip
             guest={activeGuest}
             group={activeGuest.groupId ? groupMap.get(activeGuest.groupId) : undefined}
+            compact={!!activeGuest.seat}
           />
         ) : activeTemplate ? (
           <div className="flex items-center gap-2 rounded-xl border border-rose/30 bg-surface/35 px-3 py-1.5 text-sm font-medium shadow-md backdrop-blur-md">

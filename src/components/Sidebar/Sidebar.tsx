@@ -124,7 +124,7 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="hidden w-56 shrink-0 flex-col border-r border-border bg-surface md:flex">
+    <aside className="hidden w-56 shrink-0 flex-col border-r border-border bg-surface/80 backdrop-blur-md glass-surface md:flex">
       <div className="flex items-center justify-between border-b border-border px-3 py-1.5">
         <h2 className="font-serif text-sm font-semibold text-ink">Plan</h2>
         <button

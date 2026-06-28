@@ -96,7 +96,12 @@ export const useSeatingStore = create<SeatingStore>()(
 
       toggleGuestLock: (id) =>
         set((s) => ({
-          guests: s.guests.map((g) => (g.id === id ? { ...g, locked: !g.locked } : g)),
+          guests: s.guests.map((g) => {
+            if (g.id !== id) return g
+            if (g.locked) return { ...g, locked: false }
+            if (!g.seat) return g
+            return { ...g, locked: true }
+          }),
         })),
 
       assignGuestToSeat: (guestId, tableId, seatIndex) =>
@@ -117,9 +122,10 @@ export const useSeatingStore = create<SeatingStore>()(
                 return { ...g, seat: { tableId, seatIndex } }
               }
               if (occupant && g.id === occupant.id) {
-                return guest.seat
-                  ? { ...g, seat: { ...guest.seat } }
-                  : { ...g, seat: undefined }
+                if (guest.seat) {
+                  return { ...g, seat: { ...guest.seat } }
+                }
+                return { ...g, seat: undefined, locked: false }
               }
               return g
             }),
@@ -129,10 +135,10 @@ export const useSeatingStore = create<SeatingStore>()(
       unassignGuest: (guestId) =>
         set((s) => {
           const guest = s.guests.find((g) => g.id === guestId)
-          if (!guest || guest.locked) return s
+          if (!guest || !guest.seat) return s
           return {
             guests: s.guests.map((g) =>
-              g.id === guestId ? { ...g, seat: undefined } : g,
+              g.id === guestId ? { ...g, seat: undefined, locked: false } : g,
             ),
           }
         }),
@@ -144,8 +150,16 @@ export const useSeatingStore = create<SeatingStore>()(
           if (!a || !b || a.locked || b.locked) return s
           return {
             guests: s.guests.map((g) => {
-              if (g.id === guestAId) return { ...g, seat: b.seat ? { ...b.seat } : undefined }
-              if (g.id === guestBId) return { ...g, seat: a.seat ? { ...a.seat } : undefined }
+              if (g.id === guestAId) {
+                return b.seat
+                  ? { ...g, seat: { ...b.seat } }
+                  : { ...g, seat: undefined, locked: false }
+              }
+              if (g.id === guestBId) {
+                return a.seat
+                  ? { ...g, seat: { ...a.seat } }
+                  : { ...g, seat: undefined, locked: false }
+              }
               return g
             }),
           }
@@ -217,8 +231,8 @@ export const useSeatingStore = create<SeatingStore>()(
               name: name.trim() || `Table ${s.tables.length + 1}`,
               shape,
               capacity,
-              x: Math.max(0, Math.round(x)),
-              y: Math.max(0, Math.round(y)),
+              x: Math.round(x),
+              y: Math.round(y),
               rotation: 0,
             },
           ],
@@ -233,7 +247,7 @@ export const useSeatingStore = create<SeatingStore>()(
         set((s) => ({
           tables: s.tables.filter((t) => t.id !== id),
           guests: s.guests.map((g) =>
-            g.seat?.tableId === id ? { ...g, seat: undefined } : g,
+            g.seat?.tableId === id ? { ...g, seat: undefined, locked: false } : g,
           ),
         })),
 
@@ -241,7 +255,7 @@ export const useSeatingStore = create<SeatingStore>()(
         set((s) => ({
           tables: s.tables.map((t) =>
             t.id === id
-              ? { ...t, x: Math.max(0, Math.round(x)), y: Math.max(0, Math.round(y)) }
+              ? { ...t, x: Math.round(x), y: Math.round(y) }
               : t,
           ),
         })),
@@ -288,13 +302,22 @@ export const useSeatingStore = create<SeatingStore>()(
     }),
     {
       name: 'seatfinder-storage',
-      version: 3,
+      version: 4,
       migrate: (persistedState, version) => {
-        const state = persistedState as SeatingStore
+        let state = persistedState as SeatingStore
         if (version < 3) {
-          return {
+          state = {
             ...state,
             tables: state.tables?.map((t) => ({ ...t, rotation: t.rotation ?? 0 })) ?? [],
+          }
+        }
+        if (version < 4) {
+          state = {
+            ...state,
+            guests:
+              state.guests?.map((g) =>
+                g.locked && !g.seat ? { ...g, locked: false } : g,
+              ) ?? [],
           }
         }
         return state

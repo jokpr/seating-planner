@@ -82,10 +82,10 @@ export function TopBar({ exportViewRef }: TopBarProps) {
   if (isMobile) {
     return (
       <header
-        className="flex shrink-0 items-center gap-2 border-b border-border bg-surface px-3 py-1.5 shadow-sm"
+        className="relative z-40 flex shrink-0 items-center gap-2 border-b border-border bg-surface/80 px-3 py-1.5 shadow-sm backdrop-blur-md glass-surface"
         style={{ paddingTop: 'max(0.375rem, env(safe-area-inset-top))' }}
       >
-        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-rose to-rose-dark text-white">
+        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg accent-gradient-icon text-white">
           <Sparkles className="h-3 w-3" />
         </div>
         <div className="min-w-0 flex-1">
@@ -121,9 +121,9 @@ export function TopBar({ exportViewRef }: TopBarProps) {
   }
 
   return (
-    <header className="flex items-center gap-3 border-b border-border bg-surface px-4 py-1.5 shadow-sm">
+    <header className="relative z-40 flex items-center gap-3 border-b border-border bg-surface/80 px-4 py-1.5 shadow-sm backdrop-blur-md glass-surface">
       <div className="flex items-center gap-2">
-        <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-rose to-rose-dark text-white">
+        <div className="flex h-7 w-7 items-center justify-center rounded-lg accent-gradient-icon text-white">
           <Sparkles className="h-3.5 w-3.5" />
         </div>
         <div>
@@ -156,7 +156,7 @@ export function TopBar({ exportViewRef }: TopBarProps) {
           type="button"
           onClick={handleAutoArrange}
           disabled={isRunning}
-          className="flex items-center gap-1 rounded-lg bg-gradient-to-r from-rose to-rose-dark px-3 py-1.5 text-xs font-medium text-white shadow-sm transition hover:shadow-md disabled:opacity-60"
+          className="flex items-center gap-1 rounded-lg accent-gradient-bg px-3 py-1.5 text-xs font-medium text-white shadow-sm transition hover:shadow-md disabled:opacity-60"
         >
           {isRunning ? (
             <Loader2 className="h-3.5 w-3.5 animate-spin" />

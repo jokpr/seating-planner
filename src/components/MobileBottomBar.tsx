@@ -212,7 +212,7 @@ function NavButton({
       className={cn(
         'relative flex min-h-[52px] flex-col items-center justify-center gap-0.5 rounded-xl px-1 py-1.5 text-[10px] font-medium transition',
         primary
-          ? 'bg-gradient-to-r from-rose to-rose-dark text-white shadow-sm disabled:opacity-60'
+          ? 'accent-gradient-bg text-white shadow-sm disabled:opacity-60'
           : active
             ? 'bg-rose/15 text-rose-dark'
             : 'text-muted hover:bg-cream hover:text-ink',

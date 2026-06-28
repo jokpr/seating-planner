@@ -34,7 +34,7 @@ export function GuestChip({
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: guestDragId(guest.id),
     data: { type: 'guest', guestId: guest.id } satisfies DragItem,
-    disabled: guest.locked,
+    disabled: guest.locked && !!guest.seat,
   })
 
   const groupShadow =

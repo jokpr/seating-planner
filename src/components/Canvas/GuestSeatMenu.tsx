@@ -245,19 +245,20 @@ export function GuestSeatMenu({
       </div>
 
       <div className="p-1">
-        <MenuItem
-          icon={guest.locked ? Unlock : Lock}
-          label={guest.locked ? 'Unlock seat' : 'Lock in this seat'}
-          onClick={() => {
-            toggleGuestLock(guest.id)
-            closeMenu()
-          }}
-        />
+        {guest.seat && (
+          <MenuItem
+            icon={guest.locked ? Unlock : Lock}
+            label={guest.locked ? 'Unlock seat' : 'Lock in this seat'}
+            onClick={() => {
+              toggleGuestLock(guest.id)
+              closeMenu()
+            }}
+          />
+        )}
         {guest.seat && (
           <MenuItem
             icon={UserX}
             label="Remove from table"
-            disabled={guest.locked}
             onClick={() => {
               unassignGuest(guest.id)
               closeMenu()

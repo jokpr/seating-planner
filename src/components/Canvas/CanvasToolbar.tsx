@@ -86,7 +86,7 @@ export function CanvasToolbarContent() {
           <button
             type="button"
             onClick={handleAddGuest}
-            className="flex shrink-0 items-center gap-1.5 rounded-lg bg-gradient-to-r from-rose to-rose-dark px-4 py-2.5 text-sm font-medium text-white shadow-sm"
+            className="flex shrink-0 items-center gap-1.5 rounded-lg accent-gradient-bg px-4 py-2.5 text-sm font-medium text-white shadow-sm"
           >
             <UserPlus className="h-4 w-4" />
             Add
@@ -171,7 +171,7 @@ export function CanvasToolbar() {
           <button
             type="button"
             onClick={handleAddGuest}
-            className="flex w-full items-center justify-center gap-1 rounded-md bg-gradient-to-r from-rose to-rose-dark px-2 py-1.5 text-[11px] font-medium text-white shadow-sm"
+            className="flex w-full items-center justify-center gap-1 rounded-md accent-gradient-bg px-2 py-1.5 text-[11px] font-medium text-white shadow-sm"
           >
             <UserPlus className="h-3 w-3" />
             Add
@@ -276,7 +276,6 @@ function TableTemplateChip({
 export function CanvasGuestDock() {
   const guests = useSeatingStore((s) => s.guests)
   const groups = useSeatingStore((s) => s.groups)
-  const toggleGuestLock = useSeatingStore((s) => s.toggleGuestLock)
   const removeGuest = useSeatingStore((s) => s.removeGuest)
   const addConstraint = useSeatingStore((s) => s.addConstraint)
   const linkType = useUiStore((s) => s.linkType)
@@ -345,7 +344,6 @@ export function CanvasGuestDock() {
                 isPickable={!!linkType && guest.id !== linkSourceId}
                 isSelected={guest.id === linkSourceId}
                 isMobile={isMobile}
-                onToggleLock={() => toggleGuestLock(guest.id)}
                 onClick={linkType ? () => handleRuleGuestClick(guest) : () => openMenu(guest.id)}
                 onRemove={() => removeGuest(guest.id)}
               />
@@ -365,7 +363,6 @@ function GuestDockGuestItem({
   isPickable,
   isSelected,
   isMobile,
-  onToggleLock,
   onClick,
   onRemove,
 }: {
@@ -376,7 +373,6 @@ function GuestDockGuestItem({
   isPickable: boolean
   isSelected: boolean
   isMobile: boolean
-  onToggleLock: () => void
   onClick: () => void
   onRemove: () => void
 }) {
@@ -394,7 +390,6 @@ function GuestDockGuestItem({
         guest={guest}
         group={group}
         hasConflict={hasConflict}
-        onToggleLock={onToggleLock}
         onClick={onClick}
         pickable={isPickable}
         selected={isSelected}

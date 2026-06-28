@@ -1,6 +1,6 @@
 import { forwardRef } from 'react'
 import { useSeatingStore } from '../store/useSeatingStore'
-import { getTableLayoutBounds } from '../lib/seating/layout'
+import { computeCanvasBounds } from '../lib/seating/layout'
 import { TableViewStatic } from './Canvas/TableView'
 
 export const ExportView = forwardRef<HTMLDivElement>(function ExportView(_, ref) {
@@ -9,16 +9,8 @@ export const ExportView = forwardRef<HTMLDivElement>(function ExportView(_, ref)
   const guests = useSeatingStore((s) => s.guests)
   const groups = useSeatingStore((s) => s.groups)
 
-  const bounds = tables.reduce(
-    (acc, t) => {
-      const d = getTableLayoutBounds(t)
-      return {
-        w: Math.max(acc.w, t.x + d.width + 80),
-        h: Math.max(acc.h, t.y + d.height + 100),
-      }
-    },
-    { w: 900, h: 600 },
-  )
+  const bounds = computeCanvasBounds(tables)
+  const exportPad = 80
 
   return (
     <div
@@ -28,8 +20,8 @@ export const ExportView = forwardRef<HTMLDivElement>(function ExportView(_, ref)
         position: 'fixed',
         left: 0,
         top: 0,
-        width: bounds.w + 80,
-        height: bounds.h + 160,
+        width: bounds.width + exportPad,
+        height: bounds.height + 160,
         zIndex: -1,
         pointerEvents: 'none',
         opacity: 0,
@@ -38,8 +30,8 @@ export const ExportView = forwardRef<HTMLDivElement>(function ExportView(_, ref)
       <div
         className="export-root"
         style={{
-          width: bounds.w + 80,
-          minHeight: bounds.h + 160,
+          width: bounds.width + exportPad,
+          minHeight: bounds.height + 160,
           backgroundColor: '#faf8f5',
           padding: 40,
           fontFamily: 'Inter, system-ui, sans-serif',
@@ -82,8 +74,8 @@ export const ExportView = forwardRef<HTMLDivElement>(function ExportView(_, ref)
           className="export-floor"
           style={{
             position: 'relative',
-            width: bounds.w,
-            height: bounds.h,
+            width: bounds.width,
+            height: bounds.height,
             margin: '0 auto',
             backgroundColor: '#faf8f5',
             backgroundImage: `
@@ -93,11 +85,20 @@ export const ExportView = forwardRef<HTMLDivElement>(function ExportView(_, ref)
             backgroundSize: '40px 40px',
             borderRadius: 16,
             border: '1px solid #e8e4df',
+            overflow: 'hidden',
           }}
         >
-          {tables.map((table) => (
-            <TableViewStatic key={table.id} table={table} guests={guests} groups={groups} />
-          ))}
+          <div
+            style={{
+              position: 'absolute',
+              left: bounds.offsetX,
+              top: bounds.offsetY,
+            }}
+          >
+            {tables.map((table) => (
+              <TableViewStatic key={table.id} table={table} guests={guests} groups={groups} />
+            ))}
+          </div>
         </div>
 
         <p

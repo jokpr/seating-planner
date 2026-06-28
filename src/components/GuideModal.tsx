@@ -115,7 +115,7 @@ export function GuideModal() {
           <button
             type="button"
             onClick={() => setGuideOpen(false)}
-            className="flex-1 rounded-lg bg-gradient-to-r from-rose to-rose-dark py-2.5 text-sm font-medium text-white shadow-sm hover:shadow-md"
+            className="flex-1 rounded-lg accent-gradient-bg py-2.5 text-sm font-medium text-white shadow-sm hover:shadow-md"
           >
             Got it — let's plan
           </button>

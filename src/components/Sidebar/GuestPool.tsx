@@ -11,7 +11,6 @@ export function GuestPool() {
   const addGuest = useSeatingStore((s) => s.addGuest)
   const removeGuest = useSeatingStore((s) => s.removeGuest)
   const updateGuest = useSeatingStore((s) => s.updateGuest)
-  const toggleGuestLock = useSeatingStore((s) => s.toggleGuestLock)
   const conflictIds = useGuestConflictIds()
 
   const [name, setName] = useState('')
@@ -65,7 +64,6 @@ export function GuestPool() {
                     guest={guest}
                     group={guest.groupId ? groupMap.get(guest.groupId) : undefined}
                     hasConflict={conflictIds.has(guest.id)}
-                    onToggleLock={() => toggleGuestLock(guest.id)}
                   />
                   <button
                     type="button"

@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { useDraggable } from '@dnd-kit/core'
 import { CSS } from '@dnd-kit/utilities'
-import { GripVertical, Minus, Plus, RotateCcw, RotateCw, Trash2 } from 'lucide-react'
+import { GripVertical, Minus, Plus, RotateCw, Trash2 } from 'lucide-react'
 import type { Guest, Group, Table } from '../../types'
 import {
   getSeatPositions,
@@ -40,7 +40,6 @@ function TableBody({
   isDragging,
   hasTableConflict,
   isSelected,
-  onSelect,
   interactive,
 }: {
   table: Table
@@ -56,31 +55,23 @@ function TableBody({
   isDragging?: boolean
   hasTableConflict?: boolean
   isSelected?: boolean
-  onSelect?: () => void
   interactive?: boolean
 }) {
   return (
     <>
       <div
-        data-table-select={interactive ? true : undefined}
+        data-no-pan={interactive && isSelected ? true : undefined}
         className={cn(
-          'absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 border-2 bg-gradient-to-br from-surface to-cream/80 shadow-md backdrop-blur-sm',
-          interactive && 'cursor-grab transition active:cursor-grabbing',
-          interactive && (isDragging ? 'scale-[1.02]' : 'hover:border-rose/50 hover:shadow-lg'),
+          'pointer-events-auto absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 border-2 bg-gradient-to-br from-surface to-cream/80 shadow-md backdrop-blur-sm',
+          interactive && isSelected && 'cursor-grab transition active:cursor-grabbing',
+          interactive && !isSelected && 'cursor-pointer hover:border-rose/40',
+          interactive && isSelected && (isDragging ? 'scale-[1.02]' : 'hover:border-rose/50 hover:shadow-lg'),
           !interactive && 'bg-surface shadow-sm',
           hasTableConflict ? 'border-red-300' : 'border-border/80',
           isSelected && 'ring-1 ring-rose/50',
         )}
-        {...(interactive ? dragHandleProps : {})}
-        onClick={
-          interactive && onSelect
-            ? (e) => {
-                e.stopPropagation()
-                onSelect()
-              }
-            : undefined
-        }
-        title={interactive ? 'Drag to move table' : undefined}
+        {...(interactive && isSelected ? dragHandleProps : {})}
+        title={interactive ? (isSelected ? 'Drag to move table' : 'Click to select table') : undefined}
         style={
           table.shape === 'round'
             ? { width: roundSize, height: roundSize, borderRadius: '9999px' }
@@ -188,15 +179,12 @@ export function TableView({
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: tableDragId(table.id),
     data: { type: 'table', tableId: table.id },
-    disabled: isRotating,
+    disabled: isRotating || !isSelected,
+    attributes: { tabIndex: undefined },
   })
 
   const dragStyle = transform ? { transform: CSS.Translate.toString(transform) } : undefined
   const moveHandleProps = { ...listeners, ...attributes }
-
-  const nudgeRotation = (delta: number) => {
-    setTableRotation(table.id, rotation + delta)
-  }
 
   const selectTable = () => setSelectedTableId(table.id)
 
@@ -204,30 +192,33 @@ export function TableView({
     <div
       ref={setNodeRef}
       style={{ left: table.x, top: table.y, width: layoutBounds.width, ...dragStyle }}
-      data-no-pan
+      data-no-pan={isSelected ? true : undefined}
       className={cn(
-        'absolute select-none touch-none',
+        'pointer-events-none absolute select-none',
+        isSelected && 'touch-none',
         isDragging && 'z-40 opacity-90',
         isRotating && 'z-50',
       )}
     >
       <div
         ref={pivotRef}
-        className="relative mx-auto"
+        className="pointer-events-none relative mx-auto"
         style={{ width: layoutBounds.width, height: layoutBounds.height }}
       >
         <div
-          className="absolute left-1/2 z-20 flex flex-col-reverse items-center gap-1"
+          className="pointer-events-none absolute left-1/2 z-20 flex flex-col-reverse items-center gap-1"
           style={{ top: labelAnchorTop, transform: 'translate(-50%, -100%)' }}
         >
           <div
-            data-table-select
+            data-table-label
+            data-table-id={table.id}
+            data-no-pan={isSelected ? true : undefined}
             className={cn(
-              'flex items-center justify-center gap-1 text-center text-sm font-semibold tracking-wide',
-              'cursor-grab active:cursor-grabbing',
+              'pointer-events-auto flex items-center justify-center gap-1 text-center text-sm font-semibold tracking-wide',
+              isSelected && 'cursor-grab active:cursor-grabbing',
               hasTableConflict ? 'text-red-500' : 'text-ink/80',
             )}
-            {...moveHandleProps}
+            {...(isSelected ? moveHandleProps : {})}
             onClick={(e) => {
               if ((e.target as HTMLElement).closest('button, input')) return
               e.stopPropagation()
@@ -236,9 +227,12 @@ export function TableView({
           >
             <button
               type="button"
-              className="cursor-grab rounded p-0.5 text-muted transition hover:bg-cream hover:text-ink active:cursor-grabbing"
-              {...moveHandleProps}
-              title="Drag to move table"
+              className={cn(
+                'rounded p-0.5 text-muted transition hover:bg-cream hover:text-ink',
+                isSelected && 'cursor-grab active:cursor-grabbing',
+              )}
+              {...(isSelected ? moveHandleProps : {})}
+              title={isSelected ? 'Drag to move table' : 'Select table'}
               onClick={(e) => e.stopPropagation()}
             >
               <GripVertical className="h-4 w-4" />
@@ -261,7 +255,7 @@ export function TableView({
 
           {isSelected && (
             <div
-              className="flex flex-col items-center gap-1"
+              className="pointer-events-auto flex flex-col items-center gap-1"
               onClick={(e) => e.stopPropagation()}
               data-table-controls
               data-no-pan
@@ -284,68 +278,36 @@ export function TableView({
                 >
                   <Plus className="h-3 w-3" />
                 </button>
+                <div className="mx-0.5 h-4 w-px bg-border/80" />
+                <div className="relative shrink-0">
+                  <input
+                    type="number"
+                    min={0}
+                    max={359}
+                    value={Math.round(rotation)}
+                    onChange={(e) => {
+                      const parsed = Number.parseInt(e.target.value, 10)
+                      if (!Number.isNaN(parsed)) setTableRotation(table.id, parsed)
+                    }}
+                    className="w-[2.75rem] rounded border border-border bg-cream/40 py-0.5 pl-1 pr-4 text-right text-[11px] tabular-nums text-ink outline-none [appearance:textfield] focus:border-rose/50 focus:ring-1 focus:ring-rose/30 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
+                    aria-label="Rotation in degrees"
+                  />
+                  <span className="pointer-events-none absolute right-1 top-1/2 -translate-y-1/2 text-[10px] text-muted">
+                    °
+                  </span>
+                </div>
                 <button
                   type="button"
                   onClick={() => {
                     removeTable(table.id)
                     setSelectedTableId(null)
                   }}
-                  className="ml-1 rounded border border-red-200 p-0.5 text-red-500 hover:bg-red-50 dark:border-red-800 dark:hover:bg-red-950/40"
+                  className="ml-0.5 rounded border border-red-200 p-0.5 text-red-500 hover:bg-red-50 dark:border-red-800 dark:hover:bg-red-950/40"
                   title="Remove table"
                   aria-label="Remove table"
                 >
                   <Trash2 className="h-3 w-3" />
                 </button>
-              </div>
-
-              <div className="flex flex-wrap items-center justify-center gap-1 rounded-lg border border-border/80 bg-surface/95 px-1.5 py-1 shadow-sm backdrop-blur-sm">
-                <button
-                  type="button"
-                  onClick={() => nudgeRotation(-15)}
-                  className="rounded p-1 text-muted transition hover:bg-cream hover:text-ink"
-                  title="Rotate 15° left"
-                  aria-label="Rotate 15 degrees counter-clockwise"
-                >
-                  <RotateCcw className="h-3.5 w-3.5" />
-                </button>
-                <input
-                  type="number"
-                  min={0}
-                  max={359}
-                  value={Math.round(rotation)}
-                  onChange={(e) => {
-                    const parsed = Number.parseInt(e.target.value, 10)
-                    if (!Number.isNaN(parsed)) setTableRotation(table.id, parsed)
-                  }}
-                  className="w-11 rounded border border-border bg-cream/40 px-1 py-0.5 text-center text-[11px] tabular-nums text-ink outline-none focus:border-rose/50 focus:ring-1 focus:ring-rose/30"
-                  aria-label="Rotation in degrees"
-                />
-                <span className="text-[10px] text-muted">°</span>
-                <button
-                  type="button"
-                  onClick={() => nudgeRotation(15)}
-                  className="rounded p-1 text-muted transition hover:bg-cream hover:text-ink"
-                  title="Rotate 15° right"
-                  aria-label="Rotate 15 degrees clockwise"
-                >
-                  <RotateCw className="h-3.5 w-3.5" />
-                </button>
-                <div className="mx-0.5 hidden h-4 w-px bg-border/80 sm:block" />
-                {[0, 90, 180, 270].map((preset) => (
-                  <button
-                    key={preset}
-                    type="button"
-                    onClick={() => setTableRotation(table.id, preset)}
-                    className={cn(
-                      'rounded px-1.5 py-0.5 text-[10px] tabular-nums transition',
-                      Math.round(rotation) === preset
-                        ? 'bg-rose/15 font-medium text-rose-dark'
-                        : 'text-muted hover:bg-cream hover:text-ink',
-                    )}
-                  >
-                    {preset}°
-                  </button>
-                ))}
               </div>
             </div>
           )}
@@ -353,7 +315,7 @@ export function TableView({
 
         {isSelected && (
           <div
-            className="absolute left-1/2 top-1/2 z-30 -translate-x-1/2 -translate-y-1/2"
+            className="pointer-events-none absolute left-1/2 top-1/2 z-30 -translate-x-1/2 -translate-y-1/2"
             data-table-controls
           >
             <button
@@ -361,7 +323,7 @@ export function TableView({
               data-no-pan
               onPointerDown={onRotatePointerDown}
               className={cn(
-                'flex h-7 w-7 cursor-grab touch-none items-center justify-center rounded-full border-2 bg-surface/90 shadow-md backdrop-blur-sm transition active:cursor-grabbing',
+                'pointer-events-auto flex h-7 w-7 cursor-grab touch-none items-center justify-center rounded-full border-2 bg-surface/90 shadow-md backdrop-blur-sm transition active:cursor-grabbing',
                 isRotating
                   ? 'border-rose bg-rose/10 text-rose-dark'
                   : 'border-rose/50 text-rose-dark hover:border-rose hover:bg-cream',
@@ -375,7 +337,7 @@ export function TableView({
         )}
 
         <div
-          className="absolute left-1/2 top-1/2"
+          className="pointer-events-none absolute left-1/2 top-1/2"
           style={{
             width: bodyDims.width,
             height: bodyDims.height,
@@ -393,11 +355,10 @@ export function TableView({
             groupMap={groupMap}
             conflictGuestIds={conflictGuestIds}
             onToggleLock={onToggleLock}
-            dragHandleProps={moveHandleProps}
+            dragHandleProps={isSelected ? moveHandleProps : undefined}
             isDragging={isDragging}
             hasTableConflict={hasTableConflict}
             isSelected={isSelected}
-            onSelect={selectTable}
             interactive
           />
         </div>

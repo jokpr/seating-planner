@@ -170,6 +170,53 @@ function getHeadSeats(capacity: number): SeatPosition[] {
   }))
 }
 
+export const CANVAS_PAD_X = 120
+export const CANVAS_PAD_Y = 200
+export const CANVAS_MIN_W = 1200
+export const CANVAS_MIN_H = 800
+
+export interface CanvasBounds {
+  width: number
+  height: number
+  offsetX: number
+  offsetY: number
+}
+
+/** Floor size and content offset — grows when tables move past any edge. */
+export function computeCanvasBounds(tables: Table[]): CanvasBounds {
+  if (tables.length === 0) {
+    return {
+      width: CANVAS_MIN_W,
+      height: CANVAS_MIN_H,
+      offsetX: CANVAS_PAD_X,
+      offsetY: CANVAS_PAD_Y,
+    }
+  }
+
+  let minX = Infinity
+  let minY = Infinity
+  let maxX = -Infinity
+  let maxY = -Infinity
+
+  for (const t of tables) {
+    const d = getTableLayoutBounds(t)
+    minX = Math.min(minX, t.x)
+    minY = Math.min(minY, t.y)
+    maxX = Math.max(maxX, t.x + d.width)
+    maxY = Math.max(maxY, t.y + d.height)
+  }
+
+  const contentW = maxX - minX
+  const contentH = maxY - minY
+
+  return {
+    width: Math.max(CANVAS_MIN_W, contentW + CANVAS_PAD_X * 2),
+    height: Math.max(CANVAS_MIN_H, contentH + CANVAS_PAD_Y * 2),
+    offsetX: CANVAS_PAD_X - minX,
+    offsetY: CANVAS_PAD_Y - minY,
+  }
+}
+
 export function getAdjacencyMap(shape: TableShape, capacity: number): Map<number, number[]> {
   switch (shape) {
     case 'round':
